@@ -132,12 +132,12 @@ class PandemicEnv(gym.Env):
         Returns:
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
-        plt.plot(self.infected_num_list)
-        plt.show()
+        # plt.plot(self.infected_num_list)
+        # plt.show()
 
-        plt.plot(self.reward_list)
-        plt.title("Rewards")
-        plt.show()
+        # plt.plot(self.reward_list)
+        # plt.title("Rewards")
+        # plt.show()
 
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
