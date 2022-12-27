@@ -5,6 +5,22 @@ import math
 
 
 class CreatePlayers(object):
+    """A class for generating and managing a lattice of players.
+
+    Parameters:
+    m (int): The number of rows in the lattice.
+    n (int): The number of columns in the lattice.
+    weight_vac (float): The weight for the vaccine strategy.
+    weight_inf (float): The weight for the infection strategy.
+    weight_recov (float): The weight for the recovery strategy.
+    seed_strategy (int): The initial strategy for the seed player.
+    cost_vaccine (float): The cost of using the vaccine strategy.
+    cost_infection (float): The cost of using the infection strategy.
+    cost_recover (float): The cost of using the recovery strategy.
+    lockdown_cost (float): The cost of implementing a lockdown.
+
+    """
+
     def __init__(
         self,
         m,
@@ -35,14 +51,31 @@ class CreatePlayers(object):
 
     # Functions for defining players and their attributes
     def generate_players(self):
+        """Generate players and add them to the lattice."""
         for p in range(0, (self.m * self.n)):
             self.dict_players[p] = pl.Players()
 
     def find_key(self, i, j):
+        """Find the key for the player at the given lattice coordinates.
+
+        Parameters:
+        i (int): The row coordinate.
+        j (int): The column coordinate.
+
+        Returns:
+        int: The key for the player at the given coordinates.
+        """
+        
         key = (i * self.m) + (j)
         return key
 
     def get_neighbors(self):
+        """Determine the neighbors for each player in the lattice.
+
+        This method calculates the row and column coordinates for each player
+        based on their key, and stores the coordinates in the player's attributes.
+        """
+    
         for p in range(0, self.lattice_size):
             i = int(p / self.n)
             j = p % self.n
@@ -140,6 +173,13 @@ class CreatePlayers(object):
             self.dict_players[p].num_neighbors = len(self.dict_players[p].neighbors)
 
     def get_strategy(self):
+        """Set the initial strategies for each player in the lattice.
+
+        The initial strategies are chosen randomly based on the weight values
+        for each strategy. The strategies and their corresponding weights are:
+        vaccine (weight_vac), infection (weight_inf), and recovery (weight_recov).
+        The resulting strategy for each player is stored in their attributes.
+        """        
         # np.random.seed(self.seed_strategy)
         for p in range(0, self.lattice_size):
             rand_number = np.random.random()
@@ -154,6 +194,12 @@ class CreatePlayers(object):
             self.dict_players[p].strategy_history.append(self.dict_players[p].strategy)
 
     def state_zero(self):
+        """Reset the strategies and histories for each player in the lattice.
+
+        This method sets the current strategy of each player to their initial strategy
+        and clears their strategy and payoff histories. It also resets the infection
+        time for infected players.
+        """        
         for p in range(0, self.lattice_size):
             self.dict_players[p].strategy = self.dict_players[p].strategy_history[0]
             self.dict_players[p].strategy_history = []
@@ -166,6 +212,17 @@ class CreatePlayers(object):
 
     # Functions for playing game
     def get_neighbor_strategy(self, key_player):
+        """Get the strategies of the neighbors for a given player.
+
+        Parameters:
+        key_player (int): The key for the player whose neighbors to consider.
+
+        Returns:
+        list: A list of the strategies of the neighbors.
+        int: The number of vaccinated neighbors.
+        int: The number of infected neighbors.
+        int: The number of recovered neighbors.
+        """
         neighbor_strategy = []
         for i in range(0, self.dict_players[key_player].num_neighbors):
             strategy = self.dict_players[
@@ -179,6 +236,14 @@ class CreatePlayers(object):
         return neighbor_strategy, num_vac, num_inf, num_rec
 
     def count_num_strategy(self, strategy):
+        """Count the number of players with a given strategy.
+
+        Parameters:
+        strategy (int): The strategy to count.
+
+        Returns:
+        int: The number of players with the given strategy.
+        """
         num_strategy = 0
         for p in range(0, self.lattice_size):
             if self.dict_players[p].strategy == strategy:
@@ -186,6 +251,12 @@ class CreatePlayers(object):
         return num_strategy
 
     def get_sensitivity_transmission_rate(self):
+        """Set the sensitivity and transmission rate for each player in the lattice.
+
+        The sensitivity is chosen randomly from the values 1 to 7, and is stored in
+        the player's attributes. The transmission rate is calculated based on the
+        sensitivity, and is also stored in the player's attributes.
+        """
         # np.random.seed(self.seed_strategy)
         for p in range(0, self.lattice_size):
             sensitivity = np.random.randint(1, 8)
@@ -201,6 +272,15 @@ class CreatePlayers(object):
                 self.dict_players[p].transmission_rate = 1
 
     def calc_shared_cost_player(self, key_player, contact_rate):
+        """Calculate the shared cost for a given player.
+
+        Parameters:
+        key_player (int): The key for the player whose shared cost to calculate.
+        contact_rate (float): The current contact rate in the game.
+
+        Returns:
+        float: The shared cost for the player.
+        """    
         num_infected_neighbor = self.get_neighbor_strategy(key_player)[2]
         num_vaccinated_neighbor = self.get_neighbor_strategy(key_player)[1]
         num_recovered_neighbor = self.get_neighbor_strategy(key_player)[3]
@@ -261,6 +341,17 @@ class CreatePlayers(object):
         return shared_cost
 
     def calc_as_player(self, key_player, contact_rate):
+        """
+        Calculate the actual susceptibility for a given player.
+
+        Parameters:
+        key_player (int): The key for the player whose actual susceptibility to calculate.
+        contact_rate (float): The current contact rate in the game.
+
+        Returns:
+        float: The actual susceptibility for the player.
+        """
+
         num_infected_neighbor = self.get_neighbor_strategy(key_player)[2]
         # actual_susceptibility = contact_rate * self.dict_players[key_player].transmission_rate * (num_infected_neighbor/self.dict_players[key_player].num_neighbors)
         actual_susceptibility = (
@@ -271,6 +362,15 @@ class CreatePlayers(object):
         return actual_susceptibility
 
     def calc_payoff_player(self, key_player, contact_rate):
+        """Calculate the payoff for a given player.
+
+        Parameters:
+        key_player (int): The key for the player whose payoff to calculate.
+        contact_rate (float): The current contact rate in the game.
+
+        Returns:
+        float: The payoff for the player.
+        """
         player_strategy = self.dict_players[key_player].strategy
         payoff_value = 0
         if player_strategy == 0:
@@ -293,12 +393,25 @@ class CreatePlayers(object):
         return payoff_value
 
     def calc_payoff(self, contact_rate):
+        """Calculate the payoff for all players in the game.
+
+        Parameters:
+        contact_rate (float): The current contact rate in the game.
+        """
         for p in range(0, self.lattice_size):
             self.dict_players[p].payoff_history.append(
                 self.calc_payoff_player(p, contact_rate)
             )
 
     def calc_reward(self, contact_rate):
+        """Calculate the reward for the game.
+
+        Parameters:
+        contact_rate (float): The current contact rate in the game.
+
+        Returns:
+        float: The reward for the game.
+        """
         reward = 0
 
         total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
@@ -357,6 +470,19 @@ class CreatePlayers(object):
     def update_strategy_player(
         self, key_player, iteration, contact_rate, pandemic_time
     ):
+        """
+        Updates the strategy of a single player based on their neighbor's payoffs and the player's infection rate.
+
+        Parameters:
+        key_player (int): The key of the player whose strategy is being updated.
+        iteration (int): The current iteration of the simulation.
+        contact_rate (float): The current contact rate of the simulation.
+        pandemic_time (int): The length of time the pandemic is expected to last.
+
+        Returns:
+        int: The updated strategy of the player.
+        """
+
         sensitivity_factor = self.media_affect
 
         # sensitivity_factor = self.dict_players[key_player].sensitivity
@@ -396,6 +522,17 @@ class CreatePlayers(object):
         return strategy
 
     def update_strategy(self, iterate, contact_rate, pandemic_time):
+        """
+        Updates the strategy of each player in the lattice for a given iteration. The new strategy is determined based on the player's current strategy, the state of their neighbors, and the given contact rate and pandemic time.
+
+        Parameters:
+        iterate (int): The current iteration of the simulation.
+        contact_rate (float): The probability that a player will adopt the strategy of their neighbors if they have a higher payoff.
+        pandemic_time (int): The number of iterations that a player will remain infected before recovering.
+
+        Returns:
+        None
+        """
         new_strategy = []
         for p in range(0, self.lattice_size):
             rand_number = np.random.random()
@@ -417,6 +554,17 @@ class CreatePlayers(object):
             self.dict_players[p].strategy_history.append(new_strategy[p])
 
     def update_lattice(self, iteration, contact_rate, pandemic_time):
+        """Update the strategies of players for a given number of iterations.
+    
+        Parameters
+        ----------
+        iteration : int
+            The number of iterations to update the strategies.
+        contact_rate : float
+            The rate of contact between players.
+        pandemic_time : int
+            The duration of the pandemic.
+        """
         # np.random.seed(100)
         for i in range(0, iteration):
             self.calc_payoff(contact_rate)
@@ -426,6 +574,18 @@ class CreatePlayers(object):
 
     # Functions for seeing result
     def build_matrix_strategy(self, iterate):
+        """Build a matrix representing the strategies of players at a given iteration.
+    
+        Parameters
+        ----------
+        iterate : int
+            The iteration for which to build the matrix of strategies.
+            
+        Returns
+        -------
+        matrix_strategy : list of lists
+            A matrix representing the strategies of players at the given iteration.
+        """
         matrix_strategy = [[0 for i in range(0, self.m)] for j in range(0, self.n)]
         for p in range(0, self.lattice_size):
             i = int(p / self.n)
@@ -434,6 +594,18 @@ class CreatePlayers(object):
         return matrix_strategy
 
     def build_matrix_payoff(self, iterate):
+        """Build a matrix representing the payoffs of players at a given iteration.
+    
+        Parameters
+        ----------
+        iterate : int
+            The iteration for which to build the matrix of payoffs.
+            
+        Returns
+        -------
+        matrix_payoff : list of lists
+            A matrix representing the payoffs of players at the given iteration.
+        """
         matrix_payoff = [[0 for i in range(0, self.m)] for j in range(0, self.n)]
         for p in range(0, self.lattice_size):
             i = int(p / self.n)
@@ -442,6 +614,18 @@ class CreatePlayers(object):
         return matrix_payoff
 
     def draw_matrix_strategy(self, iterate):
+        """Build a matrix representing the payoffs of players at a given iteration.
+    
+        Parameters
+        ----------
+        iterate : int
+            The iteration for which to build the matrix of payoffs.
+            
+        Returns
+        -------
+        matrix_payoff : list of lists
+            A matrix representing the payoffs of players at the given iteration.
+        """
         plt.imshow(
             self.build_matrix_strategy(iterate),
             vmin=0,
@@ -453,6 +637,21 @@ class CreatePlayers(object):
         # plt.savefig('plot.png', dpi=300, bbox_inches='tight')
 
     def count_num_strategy_result(self, iterate):
+        """
+        Counts the number of players in each strategy for a given iteration.
+
+        Parameters
+        ----------
+        iterate : int
+            The iteration for which the counts will be calculated.
+
+        Returns
+        -------
+        num_strategy : list
+            A list of integers, representing the number of players in each strategy (0, 1, 2, 3).
+        percent_strategy : list
+            A list of floats, representing the percentage of players in each strategy (0, 1, 2, 3).
+        """
         num_strategy = [0 for i in range(0, 4)]
         percent_strategy = [0 for i in range(0, 4)]
         for p in range(0, self.lattice_size):
@@ -469,6 +668,14 @@ class CreatePlayers(object):
         return num_strategy, percent_strategy
 
     def draw_num_strategy_result(self, iteration):
+        """
+        Plots the percentage of players in each strategy over time.
+
+        Parameters
+        ----------
+        iteration : int
+            The number of iterations to plot.
+        """
         percent_result = []
         for i in range(0, iteration):
             percent_result.append(self.count_num_strategy_result(i)[1])
@@ -476,6 +683,19 @@ class CreatePlayers(object):
         plt.show()
 
     def creat_list_image(self, iteration):
+        """
+        Creates a list of images representing the matrix of strategies at each iteration.
+
+        Parameters
+        ----------
+        iteration : int
+            The number of iterations to include in the list of images.
+
+        Returns
+        -------
+        list_image : list
+            A list of images representing the matrix of strategies at each iteration.
+        """
         list_image = []
         for i in range(0, iteration):
             im = plt.imshow(
@@ -491,6 +711,14 @@ class CreatePlayers(object):
         return list_image
 
     def calc_epidemic_season_length(self, iteration):
+        """Calculate the length of the epidemic season.
+        
+        Args:
+            iteration (int): The maximum number of iterations.
+            
+        Returns:
+            int: The length of the epidemic season.
+        """
         epidemic_length = iteration + 1
         for i in range(0, iteration):
             if self.count_num_strategy_result(i)[0][2] == 0:

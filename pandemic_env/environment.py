@@ -1,6 +1,6 @@
 import gym
 from gym import spaces
-import player.create_players as cp
+import players.create_players as cp
 import numpy as np
 import matplotlib.pyplot as plt
 
