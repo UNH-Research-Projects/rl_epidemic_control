@@ -16,6 +16,7 @@ class Game(object):
         cost_infection,
         cost_recover,
         lockdown_cost,
+        transmission_rate,
         iteration,
     ):
         self.m = m
@@ -32,6 +33,7 @@ class Game(object):
             cost_infection,
             cost_recover,
             lockdown_cost,
+            transmission_rate
         )
 
     def synchronous_game(self):

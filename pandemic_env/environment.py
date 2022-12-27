@@ -39,6 +39,7 @@ class PandemicEnv(gym.Env):
         cost_infection,
         cost_recover,
         lockdown_cost,
+        transmission_rate
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
@@ -59,6 +60,7 @@ class PandemicEnv(gym.Env):
             cost_infection,
             cost_recover,
             lockdown_cost,
+            transmission_rate
         )
         self.players_lattice.get_strategy()
 
@@ -91,7 +93,7 @@ class PandemicEnv(gym.Env):
         self.infected_num_list.append(num_infected)
 
         print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
-        reward = self.players_lattice.calc_reward(contact_rate)
+        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length)
 
         self.reward_list.append(reward)
         # if self.pandemic_length >= 100:

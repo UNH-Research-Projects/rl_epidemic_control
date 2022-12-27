@@ -33,6 +33,7 @@ class CreatePlayers(object):
         cost_infection,
         cost_recover,
         lockdown_cost,
+        transmission_rate
     ):
         self.m = m
         self.n = n
@@ -45,6 +46,7 @@ class CreatePlayers(object):
         self.cost_infection = cost_infection
         self.cost_recover = cost_recover
         self.lockdown_cost = lockdown_cost
+        self.transmission_rate = transmission_rate
         self.dict_players = {}
         self.generate_players()
         self.get_neighbors()
@@ -403,7 +405,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate):
+    def calc_reward(self, contact_rate, pandemic_length):
         """Calculate the reward for the game.
 
         Parameters:
@@ -414,6 +416,7 @@ class CreatePlayers(object):
         """
         reward = 0
 
+
         total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
         if contact_rate == 0.5:
             total_cost += self.lockdown_cost
@@ -422,29 +425,28 @@ class CreatePlayers(object):
             player_strategy = self.dict_players[p].strategy
 
             if player_strategy == 0:
-                weight = 0
+                reward = reward
 
             elif player_strategy == 1:
                 weight = self.cost_vaccine / total_cost
+                reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
 
             elif player_strategy == 2:
                 weight = self.cost_infection / total_cost
+                reward = reward-(weight * (pandemic_length/31))
 
             elif player_strategy == 3:
                 weight = self.cost_recover / total_cost
-
-            reward -= weight
+                reward = reward-(weight * (pandemic_length/31))
 
         # number of infected /total population (Compute in every step)
-        score = self.count_num_strategy(2) / self.lattice_size
+        infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
 
-        reward -= score
-        # if contact_rate == 0.5:
-        #     # add a lockdown cost
-        #     cost += self.lockdown_cost
+        reward1 = 1 - infection_rate
 
-        # print("Calculated reward for contact_rate {} is: {}".format(contact_rate, log_reward))
-        return np.exp(reward / self.lattice_size)
+        final_reward = (reward1*0.5) + reward 
+
+        return np.exp(final_reward)
 
     # def calc_reward(self, contact_rate):
     #     reward = 0
