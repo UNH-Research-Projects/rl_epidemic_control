@@ -430,7 +430,7 @@ class CreatePlayers(object):
         for p in range(0, self.lattice_size):
             alpha = 0
             beta = 0
-            gamma = np.exp(pandemic_length)
+            gamma = np.exp(pandemic_length)/self.lattice_size
             delta = 0
 
             player_strategy = self.dict_players[p].strategy
@@ -439,19 +439,19 @@ class CreatePlayers(object):
             #     reward = reward
 
             if player_strategy == 1:
-                delta = 0.9
+                delta = 0.5
                 # weight = self.cost_vaccine / total_cost
                 # reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
 
             elif player_strategy == 2:
-                beta = 1.5
-                alpha = 1
+                beta = 0.5
+                alpha = 0.3
                 # weight = self.cost_infection / total_cost
                 # reward = reward-(weight * (pandemic_length/31))
 
             elif player_strategy == 3:
-                alpha = 1
-                beta = 1
+                alpha = 0.5
+                beta = 0.3
                 # weight = self.cost_recover / total_cost
                 # reward = reward-(weight * (pandemic_length/31))
             
