@@ -430,7 +430,7 @@ class CreatePlayers(object):
         for p in range(0, self.lattice_size):
             alpha = 0
             beta = 0
-            gamma = np.exp(pandemic_length)/self.lattice_size
+            gamma = 0.01
             delta = 0
 
             player_strategy = self.dict_players[p].strategy
