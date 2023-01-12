@@ -416,10 +416,7 @@ class CreatePlayers(object):
         float: The reward for the game.
         """
         reward = 0
-        alpha = 0
-        beta = 0
-        gamma = np.exp(pandemic_length)
-        delta = 0
+
 
         total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
         if contact_rate == 0.5:
@@ -429,9 +426,13 @@ class CreatePlayers(object):
         Infected = self.count_num_strategy(2)/self.lattice_size
         Vaccinated = self.count_num_strategy(1)/self.lattice_size
 
-        reward_lst = []
 
         for p in range(0, self.lattice_size):
+            alpha = 0
+            beta = 0
+            gamma = np.exp(pandemic_length)
+            delta = 0
+            
             player_strategy = self.dict_players[p].strategy
  
             # if player_strategy == 0:
