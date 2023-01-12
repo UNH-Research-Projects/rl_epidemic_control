@@ -406,7 +406,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate):
+    def calc_reward(self, contact_rate, pandemic_length):
         """Calculate the reward for the game.
 
         Parameters:
@@ -418,7 +418,7 @@ class CreatePlayers(object):
         reward = 0
         alpha = 0
         beta = 0
-        gamma = 0.9
+        gamma = np.exp(pandemic_length)
         delta = 0
 
         total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
