@@ -432,7 +432,7 @@ class CreatePlayers(object):
             beta = 0
             gamma = np.exp(pandemic_length)
             delta = 0
-            
+
             player_strategy = self.dict_players[p].strategy
  
             # if player_strategy == 0:
@@ -466,7 +466,7 @@ class CreatePlayers(object):
         # final_reward = (reward1*0.5) + reward
         # 
 
-        return reward
+        return reward/self.lattice_size
 
     # def calc_reward(self, contact_rate):
     #     reward = 0
