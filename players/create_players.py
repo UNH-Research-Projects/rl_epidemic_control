@@ -462,7 +462,7 @@ class CreatePlayers(object):
 
         # final_reward = (reward1*0.5) + reward 
 
-        return reward
+        return reward/self.lattice_size
 
     # def calc_reward(self, contact_rate):
     #     reward = 0
