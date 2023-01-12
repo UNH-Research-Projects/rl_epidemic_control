@@ -429,6 +429,7 @@ class CreatePlayers(object):
         Infected = self.count_num_strategy(2)/self.lattice_size
         Vaccinated = self.count_num_strategy(1)/self.lattice_size
 
+        reward_lst = []
 
         for p in range(0, self.lattice_size):
             player_strategy = self.dict_players[p].strategy
@@ -455,14 +456,16 @@ class CreatePlayers(object):
             
             reward +=  alpha * (Recovered - beta * Infected) - gamma * total_cost - delta * (1 - Vaccinated) 
 
+
         # number of infected /total population (Compute in every step)
         # infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
 
         # reward1 = 1 - infection_rate
 
-        # final_reward = (reward1*0.5) + reward 
+        # final_reward = (reward1*0.5) + reward
+        # 
 
-        return reward/self.lattice_size
+        return np.exp(reward)
 
     # def calc_reward(self, contact_rate):
     #     reward = 0
