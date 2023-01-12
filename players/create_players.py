@@ -439,23 +439,28 @@ class CreatePlayers(object):
             #     reward = reward
 
             if player_strategy == 1:
-                delta = 0.5
+                delta = 0.2
+
+                reward -= delta * (1 - Vaccinated) 
                 # weight = self.cost_vaccine / total_cost
                 # reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
 
             elif player_strategy == 2:
-                beta = 0.5
-                alpha = 0.3
+                beta = 0.2
+                alpha = 0.1
+                reward +=  alpha * (Recovered - beta * Infected)
                 # weight = self.cost_infection / total_cost
                 # reward = reward-(weight * (pandemic_length/31))
 
             elif player_strategy == 3:
-                alpha = 0.5
-                beta = 0.3
+                alpha = 0.2
+                beta = 0.1
+
+                reward +=  alpha * (Recovered - beta * Infected)
                 # weight = self.cost_recover / total_cost
                 # reward = reward-(weight * (pandemic_length/31))
             
-            reward +=  alpha * (Recovered - beta * Infected) - gamma * total_cost - delta * (1 - Vaccinated) 
+            reward =  reward - gamma * total_cost 
 
 
         # number of infected /total population (Compute in every step)
