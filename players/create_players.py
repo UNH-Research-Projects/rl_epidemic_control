@@ -406,7 +406,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate, pandemic_length):
+    def calc_reward(self, contact_rate):
         """Calculate the reward for the game.
 
         Parameters:
@@ -416,38 +416,53 @@ class CreatePlayers(object):
         float: The reward for the game.
         """
         reward = 0
-
+        alpha = 0
+        beta = 0
+        gamma = 0.9
+        delta = 0
 
         total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
         if contact_rate == 0.5:
             total_cost += self.lockdown_cost
 
+        Recovered = self.count_num_strategy(3)/self.lattice_size
+        Infected = self.count_num_strategy(2)/self.lattice_size
+        Vaccinated = self.count_num_strategy(1)/self.lattice_size
+
+
         for p in range(0, self.lattice_size):
             player_strategy = self.dict_players[p].strategy
+ 
+            # if player_strategy == 0:
+            #     reward = reward
 
-            if player_strategy == 0:
-                reward = reward
-
-            elif player_strategy == 1:
-                weight = self.cost_vaccine / total_cost
-                reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
+            if player_strategy == 1:
+                delta = 0.9
+                # weight = self.cost_vaccine / total_cost
+                # reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
 
             elif player_strategy == 2:
-                weight = self.cost_infection / total_cost
-                reward = reward-(weight * (pandemic_length/31))
+                beta = 1.5
+                alpha = 1
+                # weight = self.cost_infection / total_cost
+                # reward = reward-(weight * (pandemic_length/31))
 
             elif player_strategy == 3:
-                weight = self.cost_recover / total_cost
-                reward = reward-(weight * (pandemic_length/31))
+                alpha = 1
+                beta = 1
+                # weight = self.cost_recover / total_cost
+                # reward = reward-(weight * (pandemic_length/31))
+            
+            reward +=  alpha * (Recovered - beta * Infected) - gamma * total_cost - delta * (1 - Vaccinated) 
 
         # number of infected /total population (Compute in every step)
-        infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
+        # infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
 
-        reward1 = 1 - infection_rate
+        # reward1 = 1 - infection_rate
 
-        final_reward = (reward1*0.5) + reward 
+        # final_reward = (reward1*0.5) + reward 
 
-        return np.exp(final_reward)
+        return reward
 
     # def calc_reward(self, contact_rate):
     #     reward = 0
