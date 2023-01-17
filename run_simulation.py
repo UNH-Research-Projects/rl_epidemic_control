@@ -63,6 +63,7 @@ del model
 from rl.agents import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
+from rl.callbacks import FileLogger, ModelIntervalCheckpoint
 
 model = build_model(states, actions)
 
@@ -75,7 +76,15 @@ def build_agent(model, actions):
 
 dqn = build_agent(model, actions)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
-reward=dqn.fit(env, nb_steps=1000, visualize=False, verbose=1)
+
+# Save weights
+weights_filename = 'dqn_weights.h5f'
+checkpoint_weights_filename = 'dqn_weights_ckpt.h5f'
+log_filename = 'dqn_log.json'
+callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=2500)]
+callbacks += [FileLogger(log_filename, interval=100)]
+reward = dqn.fit(env, callbacks=callbacks, nb_steps=5000,  visualize=False, verbose=1, log_interval=1000)
+
 # dqn.fit(env, nb_steps=50000, br=best_reward, visualize=False, verbose=1)
 train_rewards = reward.history['episode_reward']
 print(train_rewards)
@@ -85,7 +94,9 @@ plt.show()
 plt.savefig('Result.png')
 
 np.savetxt('traindata.txt', train_rewards, fmt="%s")
-dqn.save_weights('Saved/weights.h5f', overwrite=True)
+
+    # After training is done, we save the final weights one more time.
+wts = dqn.save_weights(weights_filename, overwrite=True)
 
 scores = dqn.test(env, nb_episodes=100, visualize=False)
 print(np.mean(scores.history['episode_reward']))
