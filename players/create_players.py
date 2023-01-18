@@ -406,7 +406,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate, pandemic_length):
+    def calc_reward(self, contact_rate, iterate):
         """Calculate the reward for the game.
 
         Parameters:
@@ -415,83 +415,35 @@ class CreatePlayers(object):
         Returns:
         float: The reward for the game.
         """
+        
         reward = 0
 
-
-        total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
-        if contact_rate == 0.5:
-            total_cost += self.lockdown_cost
-
-        Recovered = self.count_num_strategy(3)/self.lattice_size
-        Infected = self.count_num_strategy(2)/self.lattice_size
-        Vaccinated = self.count_num_strategy(1)/self.lattice_size
-
-
         for p in range(0, self.lattice_size):
-            alpha = 0
-            beta = 0
-            gamma = 0.01
-            delta = 0
+            prev_infected = self.count_num_strategy_result(iterate-1)[0][2] # num strategy {2}
+            current_infected = self.count_num_strategy_result(iterate)[0][2]
+
+            new_infected = prev_infected - current_infected # count of newly infected
+            print("New infected: ", new_infected)
+
+            # self.cost_infection = new_infected
+            # self.dict_players[p].transmission_rate
 
             player_strategy = self.dict_players[p].strategy
- 
-            # if player_strategy == 0:
-            #     reward = reward
 
-            if player_strategy == 1:
-                delta = 0.2
-
-                reward -= delta * (1 - Vaccinated) 
-                # weight = self.cost_vaccine / total_cost
-                # reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
-
+        # score = np.exp((self.count_num_strategy(player_strategy))
+            if player_strategy == 0:
+                reward = reward
+            elif player_strategy == 1:
+                reward = reward- self.cost_vaccine
             elif player_strategy == 2:
-                beta = 0.2
-                alpha = 0.1
-                reward +=  alpha * (Recovered - beta * Infected)
-                # weight = self.cost_infection / total_cost
-                # reward = reward-(weight * (pandemic_length/31))
-
+                reward = reward- self.cost_infection
             elif player_strategy == 3:
-                alpha = 0.2
-                beta = 0.1
-
-                reward +=  alpha * (Recovered - beta * Infected)
-                # weight = self.cost_recover / total_cost
-                # reward = reward-(weight * (pandemic_length/31))
-            
-            reward =  reward - gamma * total_cost 
-
-
-        # number of infected /total population (Compute in every step)
-        # infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
-
-        # reward1 = 1 - infection_rate
-
-        # final_reward = (reward1*0.5) + reward
-        # 
-
-        return reward/self.lattice_size
-
-    # def calc_reward(self, contact_rate):
-    #     reward = 0
-    #     for p in range(0, self.lattice_size):
-    #         player_strategy = self.dict_players[p].strategy
-
-    #     # score = np.exp((self.count_num_strategy(player_strategy))
-    #         if player_strategy == 0:
-    #             reward = reward
-    #         elif player_strategy == 1:
-    #             reward = reward- self.cost_vaccine
-    #         elif player_strategy == 2:
-    #             reward = reward- self.cost_infection
-    #         elif player_strategy == 3:
-    #             reward = reward- self.cost_recover
-    #     if contact_rate == 0.5:
-    #         reward = reward - self.lockdown_cost
-    #     else:
-    #         reward = reward
-    #     return reward
+                reward = reward- self.cost_recover
+        if contact_rate == 0.5:
+            reward = reward - self.lockdown_cost
+        else:
+            reward = reward
+        return reward
 
     # *****Main update*****
     def update_strategy_player(
