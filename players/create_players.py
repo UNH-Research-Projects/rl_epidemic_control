@@ -417,20 +417,19 @@ class CreatePlayers(object):
         """
         
         reward = 0
+        prev_strategy = self.count_num_strategy_result(iterate-1)[1] # num strategy, % strategy
+        current_strategy = self.count_num_strategy_result(iterate)[1]
 
+        self.cost_recover = ((current_strategy[1][3] - prev_strategy[1][3]) * self.weight_recov )
+        self.cost_vaccine = ((current_strategy[1][1] - prev_strategy[1][1]) * self.weight_vac )
+        # % of newly infected * weight of infection (prob) - % recovered * weight recovered
+        self.cost_infection = ((current_strategy[1][2] - prev_strategy[1][2]) * self.weight_inf ) + self.cost_recover
+        self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
+        
         for p in range(0, self.lattice_size):
-            prev_infected = self.count_num_strategy_result(iterate-1)[0][2] # num strategy {2}
-            current_infected = self.count_num_strategy_result(iterate)[0][2]
-
-            new_infected = prev_infected - current_infected # count of newly infected
-            print("New infected: ", new_infected)
-
-            # self.cost_infection = new_infected
-            # self.dict_players[p].transmission_rate
 
             player_strategy = self.dict_players[p].strategy
 
-        # score = np.exp((self.count_num_strategy(player_strategy))
             if player_strategy == 0:
                 reward = reward
             elif player_strategy == 1:
