@@ -47,6 +47,7 @@ class CreatePlayers(object):
         self.cost_recover = cost_recover
         self.lockdown_cost = lockdown_cost
         self.transmission_rate = transmission_rate
+        self.media_affect=3
         self.dict_players = {}
         self.generate_players()
         self.get_neighbors()
