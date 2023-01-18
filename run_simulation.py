@@ -5,8 +5,8 @@ import random
 from pandemic_env.environment import PandemicEnv
 import matplotlib.pylab as plt
 
-m = 100
-n = 100
+m = 50
+n = 50
 
 env = PandemicEnv(m=m, 
                   n=n, 
