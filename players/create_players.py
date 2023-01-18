@@ -50,7 +50,7 @@ class CreatePlayers(object):
         self.dict_players = {}
         self.generate_players()
         self.get_neighbors()
-        self.get_sensitivity_transmission_rate()
+        # self.get_sensitivity_transmission_rate()
 
     # Functions for defining players and their attributes
     def generate_players(self):
@@ -356,12 +356,12 @@ class CreatePlayers(object):
         """
 
         num_infected_neighbor = self.get_neighbor_strategy(key_player)[2]
-        actual_susceptibility = contact_rate * self.dict_players[key_player].transmission_rate * (num_infected_neighbor/self.dict_players[key_player].num_neighbors)
-        # actual_susceptibility = (
-        #     contact_rate
-        #     * self.transmission_rate
-        #     * (num_infected_neighbor / self.dict_players[key_player].num_neighbors)
-        # )
+        # actual_susceptibility = contact_rate * self.dict_players[key_player].transmission_rate * (num_infected_neighbor/self.dict_players[key_player].num_neighbors)
+        actual_susceptibility = (
+            contact_rate
+            * self.transmission_rate
+            * (num_infected_neighbor / self.dict_players[key_player].num_neighbors)
+        )
         return actual_susceptibility
 
     def calc_payoff_player(self, key_player, contact_rate):
@@ -427,7 +427,7 @@ class CreatePlayers(object):
             # % of newly infected * weight of infection (prob) - % recovered * weight recovered
             self.cost_infection = (current_strategy[1][2] - prev_strategy[1][2]) * 10000
             print("Cost of infection: ", self.cost_infection)
-            self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
+            # self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
         
         for p in range(0, self.lattice_size):
 
@@ -466,10 +466,9 @@ class CreatePlayers(object):
         int: The updated strategy of the player.
         """
 
-        # sensitivity_factor = self.media_affect
+        sensitivity_factor = self.media_affect
 
-        sensitivity_factor = self.dict_players[key_player].sensitivity
-        # print(f"Updating strategy of the player for sensitivity factor of ", sensitivity_factor)
+        # sensitivity_factor = self.dict_players[key_player].sensitivity # comment this out if not using variable sensitivity
 
         neighbor_payoff = []
         for i in range(0, self.dict_players[key_player].num_neighbors):
