@@ -417,8 +417,8 @@ class CreatePlayers(object):
         """
         
         reward = 0
-        prev_strategy = self.count_num_strategy_result(iterate-1)[1] # num strategy, % strategy
-        current_strategy = self.count_num_strategy_result(iterate)[1]
+        prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
+        current_strategy = self.count_num_strategy_result(iterate)
 
         self.cost_recover = ((current_strategy[1][3] - prev_strategy[1][3]) * self.weight_recov )
         self.cost_vaccine = ((current_strategy[1][1] - prev_strategy[1][1]) * self.weight_vac )
