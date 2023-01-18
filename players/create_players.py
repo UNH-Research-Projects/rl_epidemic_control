@@ -419,35 +419,39 @@ class CreatePlayers(object):
         
         reward = 0
 
+        newly_vaccinated = 0
+        newly_infected = 0
+        newly_recovered = 0
+
+        self.lockdown_cost = self.transmission_rate * self.lattice_size
+
         if iterate != 0:
             prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
             current_strategy = self.count_num_strategy_result(iterate)
 
-            # self.cost_recover = ((current_strategy[1][3] - prev_strategy[1][3]) * self.weight_recov )
-            # self.cost_vaccine = ((current_strategy[1][1] - prev_strategy[1][1]) * self.weight_vac )
-            # % of newly infected * weight of infection (prob) - % recovered * weight recovered
-            self.cost_infection = (current_strategy[1][2] - prev_strategy[1][2]) * 10000
-            print("Cost of infection: ", self.cost_infection)
-            # self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
+            newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1]
+            newly_infected = current_strategy[1][2] - prev_strategy[1][2]
+            newly_recovered = current_strategy[1][3] - prev_strategy[1][3]
+
+        reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
         
-        for p in range(0, self.lattice_size):
+        # for p in range(0, self.lattice_size):
 
-            player_strategy = self.dict_players[p].strategy
+        #     player_strategy = self.dict_players[p].strategy
 
-            if player_strategy == 0:
-                reward = reward
-            elif player_strategy == 1:
-                reward = reward- self.cost_vaccine
-            elif player_strategy == 2:
-                reward = reward- self.cost_infection
-            elif player_strategy == 3:
-                reward = reward- self.cost_recover
+        #     if player_strategy == 0:
+        #         reward = reward
+        #     elif player_strategy == 1:
+        #         reward = reward- self.cost_vaccine
+        #     elif player_strategy == 2:
+        #         reward = reward- self.cost_infection
+        #     elif player_strategy == 3:
+        #         reward = reward- self.cost_recover
         if contact_rate == 0.5:
             reward = reward - self.lockdown_cost
-            print("Lockdown Cost: ", self.lockdown_cost)
 
-        else:
-            reward = reward
+        # else:
+        #     reward = reward
         return reward
 
     # *****Main update*****
