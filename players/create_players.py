@@ -417,14 +417,17 @@ class CreatePlayers(object):
         """
         
         reward = 0
-        prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
-        current_strategy = self.count_num_strategy_result(iterate)
 
-        self.cost_recover = ((current_strategy[1][3] - prev_strategy[1][3]) * self.weight_recov )
-        self.cost_vaccine = ((current_strategy[1][1] - prev_strategy[1][1]) * self.weight_vac )
-        # % of newly infected * weight of infection (prob) - % recovered * weight recovered
-        self.cost_infection = ((current_strategy[1][2] - prev_strategy[1][2]) * self.weight_inf ) + self.cost_recover
-        self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
+        if iterate != 0:
+            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
+            current_strategy = self.count_num_strategy_result(iterate)
+
+            # self.cost_recover = ((current_strategy[1][3] - prev_strategy[1][3]) * self.weight_recov )
+            # self.cost_vaccine = ((current_strategy[1][1] - prev_strategy[1][1]) * self.weight_vac )
+            # % of newly infected * weight of infection (prob) - % recovered * weight recovered
+            self.cost_infection = (current_strategy[1][2] - prev_strategy[1][2]) * 10000
+            print("Cost of infection: ", self.cost_infection)
+            self.lockdown_cost = self.cost_infection *  (current_strategy[0][2] - prev_strategy[0][2]) # cost infection - (number of newly infected)
         
         for p in range(0, self.lattice_size):
 
@@ -440,6 +443,8 @@ class CreatePlayers(object):
                 reward = reward- self.cost_recover
         if contact_rate == 0.5:
             reward = reward - self.lockdown_cost
+            print("Lockdown Cost: ", self.lockdown_cost)
+
         else:
             reward = reward
         return reward
