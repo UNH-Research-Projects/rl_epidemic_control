@@ -423,7 +423,7 @@ class CreatePlayers(object):
         newly_infected = 0
         newly_recovered = 0
 
-        self.lockdown_cost = self.transmission_rate * self.lattice_size
+        self.lockdown_cost = self.lattice_size/10
 
         if iterate != 0:
             prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
