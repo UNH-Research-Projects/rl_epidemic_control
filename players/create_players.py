@@ -444,9 +444,10 @@ class CreatePlayers(object):
             newly_vaccinated = current_strategy[1][1] 
             newly_infected = current_strategy[1][2] 
             newly_recovered = current_strategy[1][3] 
-            
-        reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
+
+        # reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
         
+        reward = self.weight_inf * (1- newly_infected) + self.weight_recov * (1- newly_recovered) + self.weight_vac * (1- newly_vaccinated)
         # for p in range(0, self.lattice_size):
 
         #     player_strategy = self.dict_players[p].strategy
