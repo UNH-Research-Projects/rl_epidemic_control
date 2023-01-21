@@ -415,6 +415,27 @@ class CreatePlayers(object):
             )
 
     def calc_reward(self, contact_rate, iterate):
+        if iterate != 0:
+            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
+            current_strategy = self.count_num_strategy_result(iterate)
+
+            # newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1]
+            newly_infected = current_strategy[1][2] - prev_strategy[1][2]
+            # newly_recovered = current_strategy[1][3] - prev_strategy[1][3]
+
+        else:
+            # newly_vaccinated = current_strategy[1][1] 
+            newly_infected = current_strategy[1][2] 
+            # newly_recovered = current_strategy[1][3] 
+
+        unemp_rate = 0.035*100 
+        Reward1 = 1 - newly_infected 
+
+        Reward2 = 7.5 - unemp_rate
+
+        return (Reward1*0.5 + (Reward2/4) * 0.3 + (iterate / 51) * 0.2)
+
+    def calc_reward_old(self, contact_rate, iterate):
         """Calculate the reward for the game.
 
         Parameters:
