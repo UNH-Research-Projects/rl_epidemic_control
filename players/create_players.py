@@ -197,6 +197,13 @@ class CreatePlayers(object):
 
             self.dict_players[p].strategy_history.append(self.dict_players[p].strategy)
 
+    def get_age(self):
+        """Set the age for each player in the lattice.
+        """        
+        # np.random.seed(self.seed_strategy)
+        for p in range(0, self.lattice_size):            
+            self.dict_players[p].age = np.random.randint(1, 80)  
+
     def state_zero(self):
         """Reset the strategies and histories for each player in the lattice.
 
@@ -433,6 +440,11 @@ class CreatePlayers(object):
             newly_infected = current_strategy[1][2] - prev_strategy[1][2]
             newly_recovered = current_strategy[1][3] - prev_strategy[1][3]
 
+        else:
+            newly_vaccinated = current_strategy[1][1] 
+            newly_infected = current_strategy[1][2] 
+            newly_recovered = current_strategy[1][3] 
+            
         reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
         
         # for p in range(0, self.lattice_size):
