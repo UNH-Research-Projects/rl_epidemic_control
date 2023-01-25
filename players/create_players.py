@@ -414,7 +414,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate, iterate):
+    def calc_reward_(self, contact_rate, iterate):
         if iterate != 0:
             prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
             current_strategy = self.count_num_strategy_result(iterate)
@@ -435,7 +435,7 @@ class CreatePlayers(object):
 
         return (Reward1*0.5 + (Reward2/4) * 0.3 + (iterate / 51) * 0.2)
 
-    def calc_reward_old(self, contact_rate, iterate):
+    def calc_reward(self, contact_rate, iterate):
         """Calculate the reward for the game.
 
         Parameters:

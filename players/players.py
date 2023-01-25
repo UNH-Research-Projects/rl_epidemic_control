@@ -9,5 +9,6 @@ class Players(object):
         self.payoff_history = []
         self.infection_time = 1000000
         self.disease_duration = 5
-        self.sensitivity = 0
-        self.sensitivity_history = []
+        self.age = 0
+        # self.sensitivity = 0
+        # self.sensitivity_history = []
