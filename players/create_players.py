@@ -414,28 +414,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward_(self, contact_rate, iterate):
-        if iterate != 0:
-            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
-            current_strategy = self.count_num_strategy_result(iterate)
-
-            # newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1]
-            newly_infected = current_strategy[1][2] - prev_strategy[1][2]
-            # newly_recovered = current_strategy[1][3] - prev_strategy[1][3]
-
-        else:
-            # newly_vaccinated = current_strategy[1][1] 
-            newly_infected = current_strategy[1][2] 
-            # newly_recovered = current_strategy[1][3] 
-
-        unemp_rate = 0.035*100 
-        Reward1 = 1 - newly_infected 
-
-        Reward2 = 7.5 - unemp_rate
-
-        return (Reward1*0.5 + (Reward2/4) * 0.3 + (iterate / 51) * 0.2)
-
-    def calc_reward(self, contact_rate, iterate):
+    def calc_reward(self, contact_rate, iterate, reward_type):
         """Calculate the reward for the game.
 
         Parameters:
@@ -446,24 +425,43 @@ class CreatePlayers(object):
         """
         
         self.lockdown_cost = self.lattice_size/10
-        current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
 
-        if iterate != 0:
-            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
+        if reward_type == 1:
+            reward = 0
+            for p in range(0, (self.m * self.n)):
+                player_strategy = self.dict_players[p].strategy
+                if player_strategy == 0:
+                    reward = reward
+                elif player_strategy == 1:
+                    reward = reward - self.cost_vaccine
+                elif player_strategy == 2:
+                    reward = reward - self.cost_infection
+                elif player_strategy == 3:
+                    reward = reward - self.cost_recover
+            if contact_rate == 0.5:
+                reward = reward - self.lockdown_cost
+            else:
+                reward = reward
 
-            newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
-            newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
-            newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
+        elif reward_type == 2:
+            current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
 
-        else:
-            newly_vaccinated = current_strategy[1][1] 
-            newly_infected = current_strategy[1][2] 
-            newly_recovered = current_strategy[1][3] 
+            if iterate != 0:
+                prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
 
-        reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
-        
-        if contact_rate == 0.5:
-            reward = reward - self.lockdown_cost
+                newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
+                newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
+                newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
+
+            else:
+                newly_vaccinated = current_strategy[1][1] 
+                newly_infected = current_strategy[1][2] 
+                newly_recovered = current_strategy[1][3] 
+
+            reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
+            
+            if contact_rate == 0.5:
+                reward = reward - self.lockdown_cost
 
         return reward
 

@@ -39,11 +39,13 @@ class PandemicEnv(gym.Env):
         cost_infection,
         cost_recover,
         lockdown_cost,
-        transmission_rate
+        transmission_rate,
+        reward_type
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
         self.n = n
+        self.reward_type = reward_type
         # Define action and observation space
         self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(
@@ -91,7 +93,7 @@ class PandemicEnv(gym.Env):
         self.infected_num_list.append(num_infected)
 
         print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
-        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length)
+        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_type)
 
         self.reward_list.append(reward)
         # if self.pandemic_length >= 100:
