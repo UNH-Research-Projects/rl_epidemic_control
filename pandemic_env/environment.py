@@ -108,7 +108,7 @@ class PandemicEnv(gym.Env):
         # obs = np.append(state, axis=0)
         obs = state
 
-        return obs, reward, done, {}
+        return obs, reward, done, {self.infected_num_list}
 
     def take_action(self, action):
         """Adjust the contact rate based on the given action.
