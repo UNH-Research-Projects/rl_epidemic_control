@@ -40,6 +40,7 @@ class PandemicEnv(gym.Env):
         cost_recover,
         lockdown_cost,
         transmission_rate,
+        sensitivity,
         reward_type
     ):
         # super(PandemicEnv, self).__init__()
@@ -62,7 +63,8 @@ class PandemicEnv(gym.Env):
             cost_infection,
             cost_recover,
             lockdown_cost,
-            transmission_rate
+            transmission_rate,
+            sensitivity
         )
         self.players_lattice.get_strategy()
         self.pandemic_length = 0
@@ -106,7 +108,7 @@ class PandemicEnv(gym.Env):
         # obs = np.append(state, axis=0)
         obs = state
 
-        return obs, reward, done, {}
+        return obs, reward, done, {self.infected_num_list}
 
     def take_action(self, action):
         """Adjust the contact rate based on the given action.

@@ -33,7 +33,8 @@ class CreatePlayers(object):
         cost_infection,
         cost_recover,
         lockdown_cost,
-        transmission_rate
+        transmission_rate,
+        sensitivity
     ):
         self.m = m
         self.n = n
@@ -47,7 +48,7 @@ class CreatePlayers(object):
         self.cost_recover = cost_recover
         self.lockdown_cost = lockdown_cost
         self.transmission_rate = transmission_rate
-        self.media_affect=3
+        self.sensitivity = sensitivity
         self.dict_players = {}
         self.generate_players()
         self.get_neighbors()
@@ -424,7 +425,7 @@ class CreatePlayers(object):
         float: The reward for the game.
         """
         
-        self.lockdown_cost = self.lattice_size/10
+        self.lockdown_cost = self.lattice_size
 
         if reward_type == 1:
             reward = 0
@@ -482,7 +483,7 @@ class CreatePlayers(object):
         int: The updated strategy of the player.
         """
 
-        sensitivity_factor = self.media_affect
+        sensitivity_factor = self.sensitivity
 
         # sensitivity_factor = self.dict_players[key_player].sensitivity # comment this out if not using variable sensitivity
 
