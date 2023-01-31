@@ -33,7 +33,8 @@ class CreatePlayers(object):
         cost_infection,
         cost_recover,
         lockdown_cost,
-        transmission_rate
+        transmission_rate,
+        sensitivity
     ):
         self.m = m
         self.n = n
@@ -47,10 +48,11 @@ class CreatePlayers(object):
         self.cost_recover = cost_recover
         self.lockdown_cost = lockdown_cost
         self.transmission_rate = transmission_rate
+        self.sensitivity = sensitivity
         self.dict_players = {}
         self.generate_players()
         self.get_neighbors()
-        self.get_sensitivity_transmission_rate()
+        # self.get_sensitivity_transmission_rate()
 
     # Functions for defining players and their attributes
     def generate_players(self):
@@ -195,6 +197,13 @@ class CreatePlayers(object):
                 self.dict_players[p].strategy = 0  # 0 means susceptible
 
             self.dict_players[p].strategy_history.append(self.dict_players[p].strategy)
+
+    def get_age(self):
+        """Set the age for each player in the lattice.
+        """        
+        # np.random.seed(self.seed_strategy)
+        for p in range(0, self.lattice_size):            
+            self.dict_players[p].age = np.random.randint(1, 80)  
 
     def state_zero(self):
         """Reset the strategies and histories for each player in the lattice.
@@ -356,12 +365,12 @@ class CreatePlayers(object):
         """
 
         num_infected_neighbor = self.get_neighbor_strategy(key_player)[2]
-        actual_susceptibility = contact_rate * self.dict_players[key_player].transmission_rate * (num_infected_neighbor/self.dict_players[key_player].num_neighbors)
-        # actual_susceptibility = (
-        #     contact_rate
-        #     * self.transmission_rate
-        #     * (num_infected_neighbor / self.dict_players[key_player].num_neighbors)
-        # )
+        # actual_susceptibility = contact_rate * self.dict_players[key_player].transmission_rate * (num_infected_neighbor/self.dict_players[key_player].num_neighbors)
+        actual_susceptibility = (
+            contact_rate
+            * self.transmission_rate
+            * (num_infected_neighbor / self.dict_players[key_player].num_neighbors)
+        )
         return actual_susceptibility
 
     def calc_payoff_player(self, key_player, contact_rate):
@@ -406,7 +415,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate, pandemic_length):
+    def calc_reward(self, contact_rate, iterate, reward_type):
         """Calculate the reward for the game.
 
         Parameters:
@@ -415,83 +424,47 @@ class CreatePlayers(object):
         Returns:
         float: The reward for the game.
         """
-        reward = 0
+        
+        self.lockdown_cost = self.lattice_size
 
+        if reward_type == 1:
+            reward = 0
+            for p in range(0, (self.m * self.n)):
+                player_strategy = self.dict_players[p].strategy
+                if player_strategy == 0:
+                    reward = reward
+                elif player_strategy == 1:
+                    reward = reward - self.cost_vaccine
+                elif player_strategy == 2:
+                    reward = reward - self.cost_infection
+                elif player_strategy == 3:
+                    reward = reward - self.cost_recover
+            if contact_rate == 0.5:
+                reward = reward - self.lockdown_cost
+            else:
+                reward = reward
 
-        total_cost = self.cost_vaccine + self.cost_infection + self.cost_recover
-        if contact_rate == 0.5:
-            total_cost += self.lockdown_cost
+        elif reward_type == 2:
+            current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
 
-        Recovered = self.count_num_strategy(3)/self.lattice_size
-        Infected = self.count_num_strategy(2)/self.lattice_size
-        Vaccinated = self.count_num_strategy(1)/self.lattice_size
+            if iterate != 0:
+                prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
 
+                newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
+                newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
+                newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
 
-        for p in range(0, self.lattice_size):
-            alpha = 0
-            beta = 0
-            gamma = 0.01
-            delta = 0
+            else:
+                newly_vaccinated = current_strategy[1][1] 
+                newly_infected = current_strategy[1][2] 
+                newly_recovered = current_strategy[1][3] 
 
-            player_strategy = self.dict_players[p].strategy
- 
-            # if player_strategy == 0:
-            #     reward = reward
-
-            if player_strategy == 1:
-                delta = 0.2
-
-                reward -= delta * (1 - Vaccinated) 
-                # weight = self.cost_vaccine / total_cost
-                # reward = reward-(weight * (pandemic_length/31)) # lower pandemic length means higher reward
-
-            elif player_strategy == 2:
-                beta = 0.2
-                alpha = 0.1
-                reward +=  alpha * (Recovered - beta * Infected)
-                # weight = self.cost_infection / total_cost
-                # reward = reward-(weight * (pandemic_length/31))
-
-            elif player_strategy == 3:
-                alpha = 0.2
-                beta = 0.1
-
-                reward +=  alpha * (Recovered - beta * Infected)
-                # weight = self.cost_recover / total_cost
-                # reward = reward-(weight * (pandemic_length/31))
+            reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover)
             
-            reward =  reward - gamma * total_cost 
+            if contact_rate == 0.5:
+                reward = reward - self.lockdown_cost
 
-
-        # number of infected /total population (Compute in every step)
-        # infection_rate = (self.count_num_strategy(2) / self.lattice_size)*100
-
-        # reward1 = 1 - infection_rate
-
-        # final_reward = (reward1*0.5) + reward
-        # 
-
-        return reward/self.lattice_size
-
-    # def calc_reward(self, contact_rate):
-    #     reward = 0
-    #     for p in range(0, self.lattice_size):
-    #         player_strategy = self.dict_players[p].strategy
-
-    #     # score = np.exp((self.count_num_strategy(player_strategy))
-    #         if player_strategy == 0:
-    #             reward = reward
-    #         elif player_strategy == 1:
-    #             reward = reward- self.cost_vaccine
-    #         elif player_strategy == 2:
-    #             reward = reward- self.cost_infection
-    #         elif player_strategy == 3:
-    #             reward = reward- self.cost_recover
-    #     if contact_rate == 0.5:
-    #         reward = reward - self.lockdown_cost
-    #     else:
-    #         reward = reward
-    #     return reward
+        return reward
 
     # *****Main update*****
     def update_strategy_player(
@@ -510,10 +483,9 @@ class CreatePlayers(object):
         int: The updated strategy of the player.
         """
 
-        # sensitivity_factor = self.media_affect
+        sensitivity_factor = self.sensitivity
 
-        sensitivity_factor = self.dict_players[key_player].sensitivity
-        # print(f"Updating strategy of the player for sensitivity factor of ", sensitivity_factor)
+        # sensitivity_factor = self.dict_players[key_player].sensitivity # comment this out if not using variable sensitivity
 
         neighbor_payoff = []
         for i in range(0, self.dict_players[key_player].num_neighbors):

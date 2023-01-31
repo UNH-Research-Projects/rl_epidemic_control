@@ -39,11 +39,14 @@ class PandemicEnv(gym.Env):
         cost_infection,
         cost_recover,
         lockdown_cost,
-        transmission_rate
+        transmission_rate,
+        sensitivity,
+        reward_type
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
         self.n = n
+        self.reward_type = reward_type
         # Define action and observation space
         self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(
@@ -60,11 +63,10 @@ class PandemicEnv(gym.Env):
             cost_infection,
             cost_recover,
             lockdown_cost,
-            transmission_rate
+            transmission_rate,
+            sensitivity
         )
         self.players_lattice.get_strategy()
-
-        # self.players_lattice.get_sensitivity_transmission_rate()
         self.pandemic_length = 0
 
         self.infected_num_list = []
@@ -93,7 +95,7 @@ class PandemicEnv(gym.Env):
         self.infected_num_list.append(num_infected)
 
         print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
-        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length)
+        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_type)
 
         self.reward_list.append(reward)
         # if self.pandemic_length >= 100:
@@ -106,7 +108,7 @@ class PandemicEnv(gym.Env):
         # obs = np.append(state, axis=0)
         obs = state
 
-        return obs, reward, done, {}
+        return obs, reward, done, {self.infected_num_list}
 
     def take_action(self, action):
         """Adjust the contact rate based on the given action.
@@ -132,12 +134,6 @@ class PandemicEnv(gym.Env):
         Returns:
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
-        # plt.plot(self.infected_num_list)
-        # plt.show()
-
-        # plt.plot(self.reward_list)
-        # plt.title("Rewards")
-        # plt.show()
 
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
