@@ -456,11 +456,11 @@ class CreatePlayers(object):
                 
                 reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover) * iterate
 
-            else:
-                initial_vaccinated = current_strategy[1][1] 
-                initial_infected = current_strategy[1][2] 
+            # else:
+            #     initial_vaccinated = current_strategy[1][1]/self.lattice_size 
+            #     initial_infected = current_strategy[1][2]/self.lattice_size 
 
-                reward = -(initial_vaccinated * self.cost_vaccine + initial_infected * self.cost_infection) * iterate
+            #     reward = -(initial_vaccinated * self.cost_vaccine + initial_infected * self.cost_infection) * iterate
             
             if contact_rate == 0.5:
                 reward = reward - self.lockdown_cost
