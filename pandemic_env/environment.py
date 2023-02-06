@@ -71,6 +71,7 @@ class PandemicEnv(gym.Env):
 
         self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
         self.reward_list = []
+        self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
 
     def step(self, action):
         """Execute one time step within the environment.
@@ -104,9 +105,9 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
-            self.avg_infected_epi = sum(self.infected_num_list)/len(self.infected_num_list)
-            self.avg_vaccinated_epi = sum(self.vaccinated_num_list)/len(self.vaccinated_num_list)
-            self.avg_recovered_epi = sum(self.recovered_num_list)/len(self.recovered_num_list)
+            self.avg_infected_epi.append(sum(self.infected_num_list)/len(self.infected_num_list))
+            self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)/len(self.vaccinated_num_list))
+            self.avg_recovered_epi.append(sum(self.recovered_num_list)/len(self.recovered_num_list))
             done = True
         else:
             done = False
