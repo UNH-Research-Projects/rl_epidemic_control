@@ -97,7 +97,7 @@ class PandemicEnv(gym.Env):
         print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
         self.infected_num_list.append(num_infected)
         self.vaccinated_num_list.append(self.players_lattice.count_num_strategy(1))
-        self.recovered_num_list.append(self.players_lattice.count_num_strategy(2))
+        self.recovered_num_list.append(self.players_lattice.count_num_strategy(3))
 
         reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_type)
 
