@@ -69,7 +69,7 @@ class PandemicEnv(gym.Env):
         self.players_lattice.get_strategy()
         self.pandemic_length = 0
 
-        self.infected_num_list = []
+        self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
         self.reward_list = []
 
     def step(self, action):
@@ -92,12 +92,15 @@ class PandemicEnv(gym.Env):
         self.pandemic_length += iteration
 
         num_infected = self.players_lattice.count_num_strategy(2)
-        self.infected_num_list.append(num_infected)
 
         print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
+        self.infected_num_list.append(num_infected)
+        self.vaccinated_num_list.append(self.players_lattice.count_num_strategy(1))
+        self.recovered_num_list.append(self.players_lattice.count_num_strategy(1))
+
         reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_type)
 
-        self.reward_list.append(reward)
+
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
@@ -134,7 +137,13 @@ class PandemicEnv(gym.Env):
         Returns:
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
+        fig, ax = plt.subplots()
+        ax.plot(self.infected_num_list)
+        ax.plot(self.vaccinated_num_list)
+        ax.plot(self.recovered_num_list)
 
+        ax.savefig(fig, "states_"+ self.pandemic_length +".png")
+        
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
         self.pandemic_length = 0

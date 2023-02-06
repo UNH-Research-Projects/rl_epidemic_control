@@ -425,7 +425,7 @@ class CreatePlayers(object):
         float: The reward for the game.
         """
         
-        self.lockdown_cost = (iterate/35)* self.lattice_size
+        self.lockdown_cost = (iterate)* 1.01
 
         if reward_type == 1:
             reward = 0
@@ -450,17 +450,20 @@ class CreatePlayers(object):
             if iterate != 0:
                 prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
 
+                newly_susceptible = current_strategy[1][0] - prev_strategy[1][0] # 1 = vaccinated
                 newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
                 newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
                 newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
                 
-                reward = -(newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection + newly_recovered * self.cost_recover) * iterate
+                reward = -(-newly_susceptible -newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection - newly_recovered * self.cost_recover) 
 
-            # else:
-            #     initial_vaccinated = current_strategy[1][1]/self.lattice_size 
-            #     initial_infected = current_strategy[1][2]/self.lattice_size 
+            else:
+                initial_susceptible = current_strategy[1][0] 
+                initial_vaccinated = current_strategy[1][1] 
+                initial_infected = current_strategy[1][2]
+                initial_recovered = current_strategy[1][3]
 
-            #     reward = -(initial_vaccinated * self.cost_vaccine + initial_infected * self.cost_infection) * iterate
+                reward = -(-initial_susceptible -initial_vaccinated * self.cost_vaccine + initial_infected * self.cost_infection - initial_recovered*self.cost_recover)
             
             if contact_rate == 0.5:
                 reward = reward - self.lockdown_cost

@@ -87,6 +87,7 @@ dqn = build_agent(model, actions)
 
 metrics = Metrics(dqn)
 weights_filename = 'dqn_weights.h5f'
+
 # checkpoint_weights_filename = 'dqn_weights_ckpt.h5f'
 # log_filename = 'dqn_log.json'
 # callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=2500)]
