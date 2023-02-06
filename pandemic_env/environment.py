@@ -138,9 +138,9 @@ class PandemicEnv(gym.Env):
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
         fig, ax = plt.subplots()
-        ax.plot(self.infected_num_list)
-        ax.plot(self.vaccinated_num_list)
-        ax.plot(self.recovered_num_list)
+        ax.plot(self.infected_num_list, color="red")
+        ax.plot(self.vaccinated_num_list, color="blue")
+        ax.plot(self.recovered_num_list, color="green")
 
         try:
             fig.savefig(fig, "states_"+ self.pandemic_length +".png")
