@@ -41,12 +41,14 @@ class PandemicEnv(gym.Env):
         lockdown_cost,
         transmission_rate,
         sensitivity,
-        reward_type
+        reward_type,
+        plot_strategies = False
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
         self.n = n
         self.reward_type = reward_type
+        self.plot_strategies = plot_strategies
         # Define action and observation space
         self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(
@@ -141,15 +143,16 @@ class PandemicEnv(gym.Env):
         Returns:
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
-        fig, ax = plt.subplots()
-        ax.plot(self.avg_infected_epi, color="red")
-        ax.plot(self.avg_vaccinated_epi, color="blue")
-        ax.plot(self.avg_recovered_epi, color="green")
+        if self.plot_strategies:
+            fig, ax = plt.subplots()
+            ax.plot(self.avg_infected_epi, color="red")
+            ax.plot(self.avg_vaccinated_epi, color="blue")
+            ax.plot(self.avg_recovered_epi, color="green")
 
-        try:
-            fig.savefig(fig, "states_"+ self.pandemic_length +".png")
-        except:
-            plt.show()
+            try:
+                fig.savefig(fig, "states_"+ self.pandemic_length +".png")
+            except:
+                plt.show()
 
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
