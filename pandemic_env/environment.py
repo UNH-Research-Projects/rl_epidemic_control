@@ -142,8 +142,11 @@ class PandemicEnv(gym.Env):
         ax.plot(self.vaccinated_num_list)
         ax.plot(self.recovered_num_list)
 
-        ax.savefig(fig, "states_"+ self.pandemic_length +".png")
-        
+        try:
+            fig.savefig(fig, "states_"+ self.pandemic_length +".png")
+        except:
+            plt.show()
+
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
         self.pandemic_length = 0
