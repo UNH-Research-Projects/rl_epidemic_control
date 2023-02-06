@@ -104,6 +104,9 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
+            self.avg_infected_epi = sum(self.infected_num_list)/len(self.infected_num_list)
+            self.avg_vaccinated_epi = sum(self.vaccinated_num_list)/len(self.vaccinated_num_list)
+            self.avg_recovered_epi = sum(self.recovered_num_list)/len(self.recovered_num_list)
             done = True
         else:
             done = False
@@ -138,9 +141,9 @@ class PandemicEnv(gym.Env):
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
         fig, ax = plt.subplots()
-        ax.plot(self.infected_num_list, color="red")
-        ax.plot(self.vaccinated_num_list, color="blue")
-        ax.plot(self.recovered_num_list, color="green")
+        ax.plot(self.avg_infected_epi, color="red")
+        ax.plot(self.avg_vaccinated_epi, color="blue")
+        ax.plot(self.avg_recovered_epi, color="green")
 
         try:
             fig.savefig(fig, "states_"+ self.pandemic_length +".png")
