@@ -125,6 +125,9 @@ class PandemicEnv(gym.Env):
             ax.legend(['Infected', 'Vaccinated', 'Recovered'])
             ax.set_title("Change in total number of individuals for each strategy")
 
+            self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
+
+
             try:
                 plt.show()
                 fig.savefig("states_"+ str(self.pandemic_length) +".png", dpi=400)
