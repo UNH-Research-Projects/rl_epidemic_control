@@ -123,7 +123,7 @@ class PandemicEnv(gym.Env):
             ax.set_xlabel("Length of the pandemic")
             ax.set_ylabel("Number of individuals")
             ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            ax.set_title("Change in total number of individuals \n for alternating restrictions every week")
+            ax.set_title("Change in total number of individuals \n for alternating restrictions every week", fontdict={'size': 14})
 
             self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
 
