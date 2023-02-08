@@ -104,7 +104,7 @@ class PandemicEnv(gym.Env):
         self.recovered_num_list.append(self.players_lattice.count_num_strategy(3))
 
         reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_type)
-
+        self.reward_list.append(reward)
 
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
@@ -123,17 +123,21 @@ class PandemicEnv(gym.Env):
             ax.set_xlabel("Length of the pandemic")
             ax.set_ylabel("Number of individuals")
             ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            ax.set_title("Change in total number of individuals \n for alternating restrictions every week", fontdict={'size': 14})
+            ax.set_title("Change in total number of individuals \n for alternating restrictions", fontdict={'size': 10})
+            plt.show()
+
+            fig2, axe = plt.subplots()
+            axe.plot(self.reward_list, color="green")
+            axe.set_xlabel("Length of the pandemic")
+            axe.set_ylabel("Reward")
+            # ax.legend(['Infected', 'Vaccinated', 'Recovered'])
+            axe.set_title("Model Reward for alternating restrictions every week", fontdict={'size': 10})
+            plt.show()
+            fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
 
             self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
+            self.reward_list = []
 
-
-            try:
-                plt.show()
-                fig.savefig("states_"+ str(self.pandemic_length) + "action_" + str(action) +".png", dpi=400)
-
-            except Exception as e:
-                print("Can't save due to ", e)
 
             done = True
         else:
