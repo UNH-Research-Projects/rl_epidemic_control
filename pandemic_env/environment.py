@@ -126,9 +126,11 @@ class PandemicEnv(gym.Env):
             ax.set_title("Change in total number of individuals for each strategy")
 
             try:
-                fig.savefig(fig, "states_"+ self.pandemic_length +".png")
-            except:
                 plt.show()
+                plt.savefig(fig, "states_"+ self.pandemic_length +".png")
+
+            except:
+                print("Can't save")
 
             done = True
         else:
