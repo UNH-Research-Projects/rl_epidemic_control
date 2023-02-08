@@ -120,10 +120,10 @@ class PandemicEnv(gym.Env):
             ax.plot(self.infected_num_list, color="red")
             ax.plot(self.vaccinated_num_list, color="blue")
             ax.plot(self.recovered_num_list, color="green")
-            ax.set_xlabel("Episode")
+            ax.set_xlabel("Length of the pandemic")
             ax.set_ylabel("Number of individuals")
             ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            ax.set_title("Change in total number of individuals for each strategy")
+            ax.set_title("Change in total number of individuals \n for alternating restrictions every week")
 
             self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
 
