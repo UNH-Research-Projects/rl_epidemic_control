@@ -160,7 +160,7 @@ class PandemicEnv(gym.Env):
                 fig.savefig(fig, "states_"+ self.pandemic_length +".png")
             except:
                 plt.show()
-
+        self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
         self.pandemic_length = 0
