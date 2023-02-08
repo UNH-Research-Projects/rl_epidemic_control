@@ -106,10 +106,13 @@ class PandemicEnv(gym.Env):
 
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
-        if num_infected <= 0 or self.pandemic_length >=7:
-            self.avg_infected_epi.append(sum(self.infected_num_list)/len(self.infected_num_list))
-            self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)/len(self.vaccinated_num_list))
-            self.avg_recovered_epi.append(sum(self.recovered_num_list)/len(self.recovered_num_list))
+        if num_infected <= 0:
+            # self.avg_infected_epi.append(sum(self.infected_num_list)/len(self.infected_num_list))
+            # self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)/len(self.vaccinated_num_list))
+            # self.avg_recovered_epi.append(sum(self.recovered_num_list)/len(self.recovered_num_list))
+            self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
+            self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
+            self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
             done = True
         else:
             done = False
