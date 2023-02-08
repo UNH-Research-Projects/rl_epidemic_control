@@ -107,12 +107,12 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
-            # self.avg_infected_epi.append(sum(self.infected_num_list)/len(self.infected_num_list))
-            # self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)/len(self.vaccinated_num_list))
-            # self.avg_recovered_epi.append(sum(self.recovered_num_list)/len(self.recovered_num_list))
-            self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
-            self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
-            self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
+            self.avg_infected_epi.append(sum(self.infected_num_list)) #/len(self.infected_num_list))
+            self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)) #/len(self.vaccinated_num_list))
+            self.avg_recovered_epi.append(sum(self.recovered_num_list)) #/len(self.recovered_num_list))
+            # self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
+            # self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
+            # self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
             done = True
         else:
             done = False
@@ -151,6 +151,10 @@ class PandemicEnv(gym.Env):
             ax.plot(self.avg_infected_epi, color="red")
             ax.plot(self.avg_vaccinated_epi, color="blue")
             ax.plot(self.avg_recovered_epi, color="green")
+            ax.set_xlabel("Episode")
+            ax.set_ylabel("Number of individuals")
+            ax.legend(['Infected', 'Vaccinated', 'Recovered'])
+            ax.set_title("Change in total number of individuals for each strategy")
 
             try:
                 fig.savefig(fig, "states_"+ self.pandemic_length +".png")
