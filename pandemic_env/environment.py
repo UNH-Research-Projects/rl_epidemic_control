@@ -126,7 +126,7 @@ class PandemicEnv(gym.Env):
                 ax.set_xlabel("Length of the pandemic")
                 ax.set_ylabel("Number of individuals")
                 ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-                ax.set_title("Change in total number of individuals \n for alternating restrictions", fontdict={'size': 10})
+                ax.set_title("Change in total number of individuals \n for training", fontdict={'size': 10})
                 plt.show()
 
                 fig2, axe = plt.subplots()
@@ -134,7 +134,7 @@ class PandemicEnv(gym.Env):
                 axe.set_xlabel("Length of the pandemic")
                 axe.set_ylabel("Reward")
                 # ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-                axe.set_title("Model Reward for alternating restrictions every week", fontdict={'size': 10})
+                axe.set_title("Model Reward for training", fontdict={'size': 10})
                 plt.show()
                 fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
 

@@ -455,18 +455,19 @@ class CreatePlayers(object):
                 newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
                 newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
                 
-                reward = -(-newly_vaccinated * self.cost_vaccine + newly_infected * self.cost_infection - newly_recovered * self.cost_infection) 
-
+                cost = (newly_vaccinated * self.cost_vaccine) + (newly_infected * self.cost_infection) + (newly_recovered * self.cost_infection) 
             else:
                 initial_susceptible = current_strategy[1][0] 
                 initial_vaccinated = current_strategy[1][1] 
                 initial_infected = current_strategy[1][2]
                 initial_recovered = current_strategy[1][3]
 
-                reward = -(-initial_vaccinated * self.cost_vaccine + initial_infected * self.cost_infection - initial_recovered*self.cost_infection)
+                cost = (initial_vaccinated * self.cost_vaccine) + (initial_infected * self.cost_infection) + (initial_recovered*self.cost_infection)
             
             if contact_rate == 0.5:
-                reward = reward - self.lockdown_cost
+                cost = cost + self.lockdown_cost
+
+            reward = 1/(1 + np.exp(cost))
 
         return reward
 
