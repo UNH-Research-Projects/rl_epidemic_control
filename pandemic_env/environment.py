@@ -127,10 +127,10 @@ class PandemicEnv(gym.Env):
 
             try:
                 plt.show()
-                plt.savefig(fig, "states_"+ self.pandemic_length +".png")
+                plt.savefig("states_"+ self.pandemic_length +".png", dpi=400)
 
-            except:
-                print("Can't save")
+            except Exception as e:
+                print("Can't save due to ", e)
 
             done = True
         else:
