@@ -3,7 +3,9 @@ from gym import spaces
 import players.create_players as cp
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
+sns.set_style("darkgrid")
 
 class PandemicEnv(gym.Env):
     """Custom environment for simulating a pandemic.
@@ -113,6 +115,21 @@ class PandemicEnv(gym.Env):
             # self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
             # self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
             # self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
+
+            fig, ax = plt.subplots()
+            ax.plot(self.infected_num_list, color="red")
+            ax.plot(self.vaccinated_num_list, color="blue")
+            ax.plot(self.recovered_num_list, color="green")
+            ax.set_xlabel("Episode")
+            ax.set_ylabel("Number of individuals")
+            ax.legend(['Infected', 'Vaccinated', 'Recovered'])
+            ax.set_title("Change in total number of individuals for each strategy")
+
+            try:
+                fig.savefig(fig, "states_"+ self.pandemic_length +".png")
+            except:
+                plt.show()
+
             done = True
         else:
             done = False
@@ -149,8 +166,8 @@ class PandemicEnv(gym.Env):
         if self.plot_strategies:
             fig, ax = plt.subplots()
             ax.plot(self.avg_infected_epi, color="red")
-            ax.plot(self.avg_vaccinated_epi, color="blue")
-            ax.plot(self.avg_recovered_epi, color="green")
+            ax.plot(self.avg_infected_epi, color="blue")
+            ax.plot(self.avg_infected_epi, color="green")
             ax.set_xlabel("Episode")
             ax.set_ylabel("Number of individuals")
             ax.legend(['Infected', 'Vaccinated', 'Recovered'])
@@ -160,8 +177,7 @@ class PandemicEnv(gym.Env):
                 fig.savefig(fig, "states_"+ self.pandemic_length +".png")
             except:
                 plt.show()
-                
-            self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
+
 
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
