@@ -98,7 +98,7 @@ class PandemicEnv(gym.Env):
 
         num_infected = self.players_lattice.count_num_strategy(2)
 
-        print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
+        # print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
         self.infected_num_list.append(num_infected)
         self.vaccinated_num_list.append(self.players_lattice.count_num_strategy(1))
         self.recovered_num_list.append(self.players_lattice.count_num_strategy(3))
@@ -109,34 +109,37 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
-            self.avg_infected_epi.append(sum(self.infected_num_list)) #/len(self.infected_num_list))
-            self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)) #/len(self.vaccinated_num_list))
-            self.avg_recovered_epi.append(sum(self.recovered_num_list)) #/len(self.recovered_num_list))
+
+
+            # self.avg_infected_epi.append(sum(self.infected_num_list)) #/len(self.infected_num_list))
+            # self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)) #/len(self.vaccinated_num_list))
+            # self.avg_recovered_epi.append(sum(self.recovered_num_list)) #/len(self.recovered_num_list))
             # self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
             # self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
             # self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
+            if self.plot_strategies:
 
-            fig, ax = plt.subplots()
-            ax.plot(self.infected_num_list, color="red")
-            ax.plot(self.vaccinated_num_list, color="blue")
-            ax.plot(self.recovered_num_list, color="green")
-            ax.set_xlabel("Length of the pandemic")
-            ax.set_ylabel("Number of individuals")
-            ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            ax.set_title("Change in total number of individuals \n for alternating restrictions", fontdict={'size': 10})
-            plt.show()
+                fig, ax = plt.subplots()
+                ax.plot(self.infected_num_list, color="red")
+                ax.plot(self.vaccinated_num_list, color="blue")
+                ax.plot(self.recovered_num_list, color="green")
+                ax.set_xlabel("Length of the pandemic")
+                ax.set_ylabel("Number of individuals")
+                ax.legend(['Infected', 'Vaccinated', 'Recovered'])
+                ax.set_title("Change in total number of individuals \n for alternating restrictions", fontdict={'size': 10})
+                plt.show()
 
-            fig2, axe = plt.subplots()
-            axe.plot(self.reward_list, color="green")
-            axe.set_xlabel("Length of the pandemic")
-            axe.set_ylabel("Reward")
-            # ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            axe.set_title("Model Reward for alternating restrictions every week", fontdict={'size': 10})
-            plt.show()
-            fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
+                fig2, axe = plt.subplots()
+                axe.plot(self.reward_list, color="green")
+                axe.set_xlabel("Length of the pandemic")
+                axe.set_ylabel("Reward")
+                # ax.legend(['Infected', 'Vaccinated', 'Recovered'])
+                axe.set_title("Model Reward for alternating restrictions every week", fontdict={'size': 10})
+                plt.show()
+                fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
 
-            self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
-            self.reward_list = []
+                self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
+                self.reward_list = []   
 
 
             done = True
@@ -172,21 +175,6 @@ class PandemicEnv(gym.Env):
         Returns:
         np.ndarray: An m x n array representing the initial state of the lattice.
         """
-        if self.plot_strategies:
-            fig, ax = plt.subplots()
-            ax.plot(self.avg_infected_epi, color="red")
-            ax.plot(self.avg_infected_epi, color="blue")
-            ax.plot(self.avg_infected_epi, color="green")
-            ax.set_xlabel("Episode")
-            ax.set_ylabel("Number of individuals")
-            ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-            ax.set_title("Change in total number of individuals for each strategy")
-
-            try:
-                fig.savefig(fig, "states_"+ self.pandemic_length +".png")
-            except:
-                plt.show()
-
 
         self.players_lattice.state_zero()
         state = self.players_lattice.build_matrix_strategy(0)
