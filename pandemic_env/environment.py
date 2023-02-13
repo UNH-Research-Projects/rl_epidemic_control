@@ -134,6 +134,7 @@ class PandemicEnv(gym.Env):
                     ax.set_title("Change in total number of individuals \n for " + str(self.plot_title), fontdict={'size': 10})
                     
                 plt.show()
+                fig.savefig("change_plot_" + str(self.pandemic_length)+ ".png", dpi=400)
 
                 fig2, axe = plt.subplots()
                 axe.plot(self.reward_list, color="green")
@@ -151,7 +152,6 @@ class PandemicEnv(gym.Env):
 
                 self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
                 self.reward_list = []   
-
 
             done = True
         else:
