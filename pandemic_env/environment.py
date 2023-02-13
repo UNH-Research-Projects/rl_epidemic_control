@@ -44,7 +44,8 @@ class PandemicEnv(gym.Env):
         transmission_rate,
         sensitivity,
         reward_type,
-        plot_strategies = False
+        plot_strategies = False,
+        train=True
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
@@ -76,6 +77,7 @@ class PandemicEnv(gym.Env):
         self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
         self.reward_list = []
         self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
+        self.train = train
 
     def step(self, action):
         """Execute one time step within the environment.
@@ -126,7 +128,11 @@ class PandemicEnv(gym.Env):
                 ax.set_xlabel("Length of the pandemic")
                 ax.set_ylabel("Number of individuals")
                 ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-                ax.set_title("Change in total number of individuals \n for training", fontdict={'size': 10})
+                if self.train:
+                    ax.set_title("Change in total number of individuals \n for training", fontdict={'size': 10})
+                else:
+                    ax.set_title("Change in total number of individuals \n for testing", fontdict={'size': 10})
+                    
                 plt.show()
 
                 fig2, axe = plt.subplots()

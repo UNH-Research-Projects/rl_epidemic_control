@@ -468,6 +468,7 @@ class CreatePlayers(object):
                 cost = cost + self.lockdown_cost
 
             reward = 1/(1 + np.exp(cost))
+            # or try reLu
 
         return reward
 
