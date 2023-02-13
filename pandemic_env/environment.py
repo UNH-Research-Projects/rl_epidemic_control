@@ -140,7 +140,12 @@ class PandemicEnv(gym.Env):
                 axe.set_xlabel("Length of the pandemic")
                 axe.set_ylabel("Reward")
                 # ax.legend(['Infected', 'Vaccinated', 'Recovered'])
-                axe.set_title("Model Reward for training", fontdict={'size': 10})
+                if self.train:
+                    axe.set_title("Model Reward for training", fontdict={'size': 10})
+
+                else:
+                    axe.set_title("Model Reward for testing", fontdict={'size': 10})
+        
                 plt.show()
                 fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
 
