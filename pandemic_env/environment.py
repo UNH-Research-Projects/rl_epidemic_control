@@ -44,14 +44,14 @@ class PandemicEnv(gym.Env):
         transmission_rate,
         sensitivity,
         reward_type,
-        plot_strategies = False,
+        plot_title=None,
         train=True
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
         self.n = n
         self.reward_type = reward_type
-        self.plot_strategies = plot_strategies
+        self.plot_title = plot_title
         # Define action and observation space
         self.action_space = spaces.Discrete(2)
         self.observation_space = spaces.Box(
@@ -119,7 +119,7 @@ class PandemicEnv(gym.Env):
             # self.avg_infected_epi.append(self.players_lattice.count_num_strategy(2))
             # self.avg_vaccinated_epi.append(self.players_lattice.count_num_strategy(1))
             # self.avg_recovered_epi.append(self.players_lattice.count_num_strategy(3))
-            if self.plot_strategies:
+            if self.plot_title is not None:
 
                 fig, ax = plt.subplots()
                 ax.plot(self.infected_num_list, color="red")
@@ -131,7 +131,7 @@ class PandemicEnv(gym.Env):
                 if self.train:
                     ax.set_title("Change in total number of individuals \n for training", fontdict={'size': 10})
                 else:
-                    ax.set_title("Change in total number of individuals \n for testing", fontdict={'size': 10})
+                    ax.set_title("Change in total number of individuals \n for " + str(self.plot_title), fontdict={'size': 10})
                     
                 plt.show()
 
@@ -144,7 +144,7 @@ class PandemicEnv(gym.Env):
                     axe.set_title("Model Reward for training", fontdict={'size': 10})
 
                 else:
-                    axe.set_title("Model Reward for testing", fontdict={'size': 10})
+                    axe.set_title("Model Reward for "+ str(self.plot_title), fontdict={'size': 10})
         
                 plt.show()
                 fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
