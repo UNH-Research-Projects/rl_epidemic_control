@@ -153,7 +153,7 @@ class PandemicEnv(gym.Env):
                 fig3, ax3 = plt.subplots()
                 colors = ['red' if i == 1 else 'green' for i in self.actions_taken]
 
-                ax3.scatter(np.arange(1, self.pandemic_length), self.actions_taken, c=colors)
+                ax3.scatter(np.arange(1, len(self.actions_taken)+1), self.actions_taken, c=colors)
                 axe.set_xlabel("Length of the pandemic")
                 axe.set_ylabel("Action")
                 
