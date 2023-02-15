@@ -75,7 +75,7 @@ class PandemicEnv(gym.Env):
         self.pandemic_length = 0
 
         self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
-        self.reward_list = []
+        self.reward_list, self.actions_taken = [], []
         self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
         self.train = train
 
@@ -98,6 +98,8 @@ class PandemicEnv(gym.Env):
         state = self.players_lattice.build_matrix_strategy(pandemic_time)
         self.pandemic_length += iteration
 
+        # actions
+        self.actions_taken.append(action)
         num_infected = self.players_lattice.count_num_strategy(2)
 
         # print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
@@ -111,8 +113,6 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
-
-
             # self.avg_infected_epi.append(sum(self.infected_num_list)) #/len(self.infected_num_list))
             # self.avg_vaccinated_epi.append(sum(self.vaccinated_num_list)) #/len(self.vaccinated_num_list))
             # self.avg_recovered_epi.append(sum(self.recovered_num_list)) #/len(self.recovered_num_list))
@@ -149,6 +149,22 @@ class PandemicEnv(gym.Env):
         
                 plt.show()
                 fig2.savefig("reward_alternative_" + str(self.pandemic_length)+ ".png", dpi=400)
+
+                fig3, ax3 = plt.subplots()
+                colors = ['red' if i == 1 else 'green' for i in self.actions_taken]
+
+                ax3.scatter(self.actions_taken, c=colors)
+                axe.set_xlabel("Length of the pandemic")
+                axe.set_ylabel("Action")
+                
+                if self.train:
+                    ax3.set_title("Model actions for training", fontdict={'size': 10})
+
+                else:
+                    ax3.set_title("Model actions for "+ str(self.plot_title), fontdict={'size': 10})
+
+                plt.show()
+                fig3.savefig("actions" + str(self.pandemic_length)+ ".png", dpi=400)
 
                 self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
                 self.reward_list = []   
