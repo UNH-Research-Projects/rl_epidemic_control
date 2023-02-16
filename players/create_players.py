@@ -415,7 +415,7 @@ class CreatePlayers(object):
                 self.calc_payoff_player(p, contact_rate)
             )
 
-    def calc_reward(self, contact_rate, iterate, reward_type):
+    def calc_reward(self, contact_rate, iterate, reward_factor):
         """Calculate the reward for the game.
 
         Parameters:
@@ -427,48 +427,28 @@ class CreatePlayers(object):
         
         self.lockdown_cost = (self.lattice_size)* 0.1
 
-        if reward_type == 1:
-            reward = 0
-            for p in range(0, (self.m * self.n)):
-                player_strategy = self.dict_players[p].strategy
-                if player_strategy == 0:
-                    reward = reward
-                elif player_strategy == 1:
-                    reward = reward - self.cost_vaccine
-                elif player_strategy == 2:
-                    reward = reward - self.cost_infection
-                elif player_strategy == 3:
-                    reward = reward - self.cost_recover
-            if contact_rate == 0.5:
-                reward = reward - self.lockdown_cost
-            else:
-                reward = reward
+        current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
 
-        elif reward_type == 2:
-            current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
+        if iterate != 0:
+            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
 
-            if iterate != 0:
-                prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
-
-                newly_susceptible = current_strategy[1][0] - prev_strategy[1][0] # 1 = vaccinated
-                newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
-                newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
-                newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
-                
-                cost = (newly_vaccinated * self.cost_vaccine) + (newly_infected * self.cost_infection) + (newly_recovered * self.cost_infection) 
-            else:
-                initial_susceptible = current_strategy[1][0] 
-                initial_vaccinated = current_strategy[1][1] 
-                initial_infected = current_strategy[1][2]
-                initial_recovered = current_strategy[1][3]
-
-                cost = (initial_vaccinated * self.cost_vaccine) + (initial_infected * self.cost_infection) + (initial_recovered*self.cost_infection)
+            newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
+            newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
+            newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
             
-            if contact_rate == 0.5:
-                cost = cost + self.lockdown_cost
+            cost = (newly_vaccinated * self.cost_vaccine) + (newly_infected * self.cost_infection) + (newly_recovered * self.cost_infection) 
+        else:
+            initial_vaccinated = current_strategy[1][1] 
+            initial_infected = current_strategy[1][2]
+            initial_recovered = current_strategy[1][3]
 
-            reward = 1/(1 + np.exp(cost))
-            # or try reLu
+            cost = (initial_vaccinated * self.cost_vaccine) + (initial_infected * self.cost_infection) + (initial_recovered*self.cost_infection)
+        
+        if contact_rate == 0.5:
+            cost = cost + self.lockdown_cost
+
+        reward = 1/(1 + np.exp(reward_factor*cost))
+        # or try reLu
 
         return reward
 
@@ -730,3 +710,36 @@ class CreatePlayers(object):
                 epidemic_length = i
                 break
         return epidemic_length
+
+
+    def plot_episode_changes(self, plot_title, pandemic_length, infected_num_list, vaccinated_num_list, recovered_num_list, reward_list):
+        """
+        Plots the changes in different values during an episode of the simulation. It takes in the following parameters:
+        Args:
+            plot_title: Title of the plot
+            pandemic_length: Length of the pandemic
+            infected_num_list: List of number of infected individuals
+            vaccinated_num_list: List of number of vaccinated individuals
+            recovered_num_list: List of number of recovered individuals
+            reward_list: List of rewards obtained during the episode
+        """
+        fig, ax = plt.subplots()
+        ax.plot(infected_num_list, color="red")
+        ax.plot(vaccinated_num_list, color="blue")
+        ax.plot(recovered_num_list, color="green")
+        ax.set_xlabel("Length of the pandemic")
+        ax.set_ylabel("Number of individuals")
+        ax.legend(['Infected', 'Vaccinated', 'Recovered'])    
+        ax.set_title("Change in total number of individuals \n for " + str(self.plot_title), fontdict={'size': 10})
+            
+        plt.show()
+        fig.savefig("change_plot_" + str(pandemic_length)+ ".png", dpi=400)
+
+        fig2, axe = plt.subplots()
+        axe.plot(reward_list, color="green")
+        axe.set_xlabel("Length of the pandemic")
+        axe.set_ylabel("Reward")
+        axe.set_title("Model Reward for "+ str(plot_title), fontdict={'size': 10})
+
+        plt.show()
+        fig2.savefig("reward_alternative_" + str(pandemic_length)+ ".png", dpi=400)
