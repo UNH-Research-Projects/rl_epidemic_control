@@ -730,7 +730,7 @@ class CreatePlayers(object):
         ax.set_xlabel("Length of the pandemic")
         ax.set_ylabel("Number of individuals")
         ax.legend(['Infected', 'Vaccinated', 'Recovered'])    
-        ax.set_title("Change in total number of individuals \n for " + str(self.plot_title), fontdict={'size': 10})
+        ax.set_title("Change in total number of individuals \n for " + str(plot_title), fontdict={'size': 10})
             
         plt.show()
         fig.savefig("change_plot_" + str(pandemic_length)+ ".png", dpi=400)
