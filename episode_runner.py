@@ -19,40 +19,9 @@ from rl.callbacks import FileLogger, ModelIntervalCheckpoint , TrainEpisodeLogge
 import mlflow, mlflow.keras
 import json
 import logging
-import plotly.express as px
-from rl.policy import EpsGreedyQPolicy
 
 logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
-# Adam._name = 'hey'
-# Define the custom policy
-# class CustomPolicy(EpsGreedyQPolicy):
-#     def compute_action(self, q_values, eps=0):
-#         print("STEPS:", self.steps)
-#         q_values = q_values.flatten()
-#         action = np.argmax(q_values)
-#         if self.steps % 7 == 0:
-#             action = 0
-#         else:
-#             action = 1
-#         return action
-
-# class CustomPolicy(BoltzmannQPolicy):
-#     def __init__(self, steps=7, *args, **kwargs):
-#         # self.steps = steps
-#         # self.counter = 0
-#         super(CustomPolicy, self).__init__(*args, **kwargs)
-    
-#     def select_action(self, q_values):
-#         action = 1
-
-#         # print("COUNTER:", self.counter)
-#         # if self.counter % (2 * self.steps) < self.steps:
-#         #     action = 0
-#         # else:
-#         #     action = 1
-#         # self.counter += 1
-#         return action
 
 class ep_run():
   def __init__(self, 
@@ -109,11 +78,9 @@ class ep_run():
       Build a sequential model.
       """
       model = Sequential()
-      model.add(Dense(24, activation='relu', input_dim=states[0]))
-      model.add(Reshape((2500,), input_shape=(1,m,n)))
-      model.add(Dense(2500, activation='relu'))
-      model.add(Dense(2500, activation='relu'))
-      model.add(Dense(actions, activation='linear'))
+      model.add(Flatten(input_shape=(1,) + self.states))
+      model.add(Dense(32, activation='relu'))
+      model.add(Dense(2, activation='linear'))
       return model
 
   def build_agent(self, model, actions):
