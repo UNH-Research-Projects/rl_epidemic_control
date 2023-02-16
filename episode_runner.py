@@ -2,17 +2,57 @@ from gym import Env
 from gym.spaces import Discrete, Box
 import numpy as np
 import random
+import pickle
 from pandemic_env.environment import PandemicEnv
 from pandemic_env.metrics import Metrics
 import matplotlib.pylab as plt
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Reshape, Activation
-from tensorflow.keras.optimizers import Adam, RMSprop
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.optimizers.legacy import Adam
 
 from rl.agents import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
-from rl.callbacks import FileLogger, ModelIntervalCheckpoint
+from rl.callbacks import FileLogger, ModelIntervalCheckpoint , TrainEpisodeLogger
+
+import mlflow, mlflow.keras
+import json
+import logging
+import plotly.express as px
+from rl.policy import EpsGreedyQPolicy
+
+logging.basicConfig(level=logging.WARN)
+logger = logging.getLogger(__name__)
+# Adam._name = 'hey'
+# Define the custom policy
+# class CustomPolicy(EpsGreedyQPolicy):
+#     def compute_action(self, q_values, eps=0):
+#         print("STEPS:", self.steps)
+#         q_values = q_values.flatten()
+#         action = np.argmax(q_values)
+#         if self.steps % 7 == 0:
+#             action = 0
+#         else:
+#             action = 1
+#         return action
+
+# class CustomPolicy(BoltzmannQPolicy):
+#     def __init__(self, steps=7, *args, **kwargs):
+#         # self.steps = steps
+#         # self.counter = 0
+#         super(CustomPolicy, self).__init__(*args, **kwargs)
+    
+#     def select_action(self, q_values):
+#         action = 1
+
+#         # print("COUNTER:", self.counter)
+#         # if self.counter % (2 * self.steps) < self.steps:
+#         #     action = 0
+#         # else:
+#         #     action = 1
+#         # self.counter += 1
+#         return action
 
 class ep_run():
   def __init__(self, 
@@ -25,11 +65,13 @@ class ep_run():
               seed_strategy=4, 
               cost_vaccine=10, 
               cost_infection=1000, 
-              cost_recover=0, 
+              cost_recover=0.1, 
               lockdown_cost=10000, 
               transmission_rate=0.5,
               sensitivity=3,
-              reward_type= 2):
+              reward_factor= 2,
+              plot_title=None,
+              train=True):
     
     self.env = PandemicEnv(m=m, 
                   n=n, 
@@ -43,84 +85,138 @@ class ep_run():
                   lockdown_cost=lockdown_cost, 
                   transmission_rate=transmission_rate,
                   sensitivity=sensitivity,
-                  reward_type=reward_type)
+                  reward_factor=reward_factor,
+                  plot_title=plot_title,
+                  train=train)
 
     self.states = self.env.observation_space.shape
-    self.actions = self.env.action_space.n
 
+    # if action_space is not None:
+    #   self.env.action_space = action_space
+
+    self.actions = self.env.action_space.n
+    self.EXPERIMENT_NAME = "rl-training"
+
+    try:
+        self.EXPERIMENT_ID = mlflow.create_experiment(self.EXPERIMENT_NAME)
+
+    except:
+        experiment = mlflow.get_experiment_by_name(self.EXPERIMENT_NAME)
+        self.EXPERIMENT_ID = experiment.experiment_id   
 
   def build_model(self, states, actions):
+      """
+      Build a sequential model.
+      """
       model = Sequential()
-      #model.add(Dense(24, activation='relu', input_dim=states[0]))
-      # model.add(Reshape((2500,), input_shape=(1,m,n)))
-      # model.add(Dense(2500, activation='relu'))
-      # model.add(Dense(2500, activation='relu'))
-      # model.add(Dense(actions, activation='linear'))
-
-      model.add(Flatten(input_shape=(1,) + self.states))
-      model.add(Dense(64))
-      model.add(Activation('relu'))
-      model.add(Dense(64))
-      model.add(Activation('relu'))
-      model.add(Dense(64))
-      model.add(Activation('relu'))
+      model.add(Dense(24, activation='relu', input_dim=states[0]))
+      model.add(Reshape((2500,), input_shape=(1,m,n)))
+      model.add(Dense(2500, activation='relu'))
+      model.add(Dense(2500, activation='relu'))
       model.add(Dense(actions, activation='linear'))
       return model
 
   def build_agent(self, model, actions):
+      """
+      Build a DQN Agent.
+      """
       policy = BoltzmannQPolicy()
+
       memory = SequentialMemory(limit=50000, window_length=1)
       dqn = DQNAgent(model=model, 
-                  nb_actions=actions, 
-                  memory=memory, 
-              #    enable_dueling_network=True, 
-              #    dueling_type='avg', 
-                target_model_update=1e-2, 
-                policy=policy,
-                nb_steps_warmup=35,
-                # train_interval=4,
-                # delta_clip=1.,
-                enable_double_dqn=True)
-      dqn.compile(Adam(3e-4), metrics=['mae'])
+                    nb_actions=actions, 
+                    memory=memory, 
+                    target_model_update=1e-2, 
+                    policy=policy,
+                    nb_steps_warmup=35,
+                    enable_double_dqn=True)
       return dqn
 
   def build_model_agent(self, lr, num_steps, verbose =2, save_weights=True):
+    """
+    Build DQN model and agent.
+    """
     model = self.build_model(self.states, self.actions)
     print(model.summary())
 
     dqn = self.build_agent(model, self.actions)
-    dqn.compile(Adam(lr=lr), metrics=['mae'])
+    dqn.compile(Adam(learning_rate=lr), metrics=['mae'])
 
     metrics = Metrics(dqn)
-    reward = dqn.fit(self.env, callbacks=[metrics], nb_steps=num_steps,  visualize=False, verbose=verbose)
+
+    log_filename = 'dqn_logs.json'
+    checkpoint_weights_filename = 'dqn_weights_ckpt.h5f'
+    # callbacks = [TrainEpisodeLogger()]
+    # tensorboard_callback = [TensorBoard(log_dir="./logs")]
+
+    callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=500)]
+    callbacks += [FileLogger(log_filename, interval=1)]
+    reward = dqn.fit(self.env, callbacks=callbacks, nb_steps=num_steps,  visualize=False, verbose=verbose)
 
     if save_weights:
       weights_filename = 'dqn_weights.h5f'
       dqn.save_weights(weights_filename, overwrite=True)
 
-    return reward
+    return reward, dqn
 
-  def run_experimentation(self, model_name, lr = 1e-4, num_steps=1000,):
-    with mlflow.start_run():
-      reward = self.build_model_agent(lr = lr, num_steps=num_steps)
-      mlflow.log_param("reward_history", reward.history)
-      # mlflow.log_param("strategy_history", l1_ratio)
-      # mlflow.log_metric("metrics", metrics)
+  def run_experimentation(self, run_name, lr = 1e-3, num_steps=1000):
+    """
+    Run experimentation to be logged in MLFlow.
+    """
+    # start mlflow experiment run
+    with mlflow.start_run(experiment_id=self.EXPERIMENT_ID, run_name=run_name):
+      reward, dqn = self.build_model_agent(lr = lr, num_steps=num_steps)
+      pickle.dump( reward.history, open( "reward_history.p", "wb" ) )
 
-      tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+      mlflow.log_artifact("reward_history.p")
+      mlflow.keras.log_model(dqn.model, "model")
+      
+      # Plot rewards
+      fig, ax = plt.subplots()
+      ax.plot(reward.history['episode_reward'])
+      plt.xlabel("Episode")
+      plt.ylabel("Reward")
+      plt.title("Training rewards")
+    
+      # log the plot and log it as a figure
+      plt.savefig("train_rewards-plot.png", dpi=400)
+      mlflow.log_figure(fig, "train_rewards-plot.png") 
+      
+      return reward, dqn
 
-      # Model registry does not work with file store
-      if tracking_url_type_store != "file":
+  def test(self, env, experiment_type, num_episodes):
+    """
+    Test the model manually.
+    """
 
-          # Register the model
-          # There are other ways to use the Model Registry, which depends on the use case,
-          # please refer to the doc for more information:
-          # https://mlflow.org/docs/latest/model-registry.html#api-workflow
-          mlflow.sklearn.log_model(lr, "model", registered_model_name=model_name)
-      else:
-          mlflow.sklearn.log_model(lr, "model")
+    rewards = []
+    for i in range(num_episodes):
+        obs = env.reset()
+        done = False
+        total_reward = 0
+        steps=7
+        counter=0
+        while not done:
+          if experiment_type == "lockdown":
+            action = 1
+          elif experiment_type == "no lockdown":
+            action = 0
+          else:
+            # for every weekly
+            if counter % (2 * steps) < steps:
+              action = 0
+            else:
+              action = 1
+          counter += 1
+          obs, reward, done, info = env.step(action)
+          total_reward += reward
+        rewards.append(total_reward)
 
-# checkpoint_weights_filename = 'dqn_weights_ckpt.h5f'
-# log_filename = 'dqn_log.json'
-# callbacks = [ModelIntervalCheckpoint(checkpoint_weights_filename, interval=2500)]
-# callbacks += [FileLogger(log_filename, interval=100)]
+    return rewards
+
+# # training
+# reward, dqn = ep_run(plot_title="Training", train=True).run_experimentation(run_name = "RUN_NAME", lr=1e-3, num_steps=20000)
+
+# # testing
+# test_ep_runner = ep_run(action_space=Discrete(1), plot_title="continuous restrictions", train=False) # lockdown
+# test_reward = test_ep_runner.test(test_ep_runner.env, experiment_type="lockdown", num_episodes=1)
