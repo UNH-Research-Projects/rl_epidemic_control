@@ -113,9 +113,9 @@ class PandemicEnv(gym.Env):
         # if self.pandemic_length >= 100:
         # if self.players_lattice.count_num_strategy(2) <= 0.01*(self.m*self.n):
         if num_infected <= 0:
-
+            # plot charts showing change in values as the episode runs
             if self.plot_title is not None:
-                self.players_lattice.plot_episode_changes(self.plot_title, self.pandemic_length, self.actions_taken) 
+                self.players_lattice.plot_episode_changes(self.plot_title, self.pandemic_length, self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list, self.reward_list) 
                 
             # reset list values    
             self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
