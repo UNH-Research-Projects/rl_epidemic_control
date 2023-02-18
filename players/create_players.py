@@ -34,7 +34,7 @@ class CreatePlayers(object):
         cost_recover,
         lockdown_cost,
         transmission_rate,
-        sensitivity
+        sensitivity,
     ):
         self.m = m
         self.n = n
@@ -70,7 +70,7 @@ class CreatePlayers(object):
         Returns:
         int: The key for the player at the given coordinates.
         """
-        
+
         key = (i * self.m) + (j)
         return key
 
@@ -80,7 +80,7 @@ class CreatePlayers(object):
         This method calculates the row and column coordinates for each player
         based on their key, and stores the coordinates in the player's attributes.
         """
-    
+
         for p in range(0, self.lattice_size):
             i = int(p / self.n)
             j = p % self.n
@@ -184,7 +184,7 @@ class CreatePlayers(object):
         for each strategy. The strategies and their corresponding weights are:
         vaccine (weight_vac), infection (weight_inf), and recovery (weight_recov).
         The resulting strategy for each player is stored in their attributes.
-        """        
+        """
         # np.random.seed(self.seed_strategy)
         for p in range(0, self.lattice_size):
             rand_number = np.random.random()
@@ -199,11 +199,10 @@ class CreatePlayers(object):
             self.dict_players[p].strategy_history.append(self.dict_players[p].strategy)
 
     def get_age(self):
-        """Set the age for each player in the lattice.
-        """        
+        """Set the age for each player in the lattice."""
         # np.random.seed(self.seed_strategy)
-        for p in range(0, self.lattice_size):            
-            self.dict_players[p].age = np.random.randint(1, 80)  
+        for p in range(0, self.lattice_size):
+            self.dict_players[p].age = np.random.randint(1, 80)
 
     def state_zero(self):
         """Reset the strategies and histories for each player in the lattice.
@@ -211,7 +210,7 @@ class CreatePlayers(object):
         This method sets the current strategy of each player to their initial strategy
         and clears their strategy and payoff histories. It also resets the infection
         time for infected players.
-        """        
+        """
         for p in range(0, self.lattice_size):
             self.dict_players[p].strategy = self.dict_players[p].strategy_history[0]
             self.dict_players[p].strategy_history = []
@@ -292,7 +291,7 @@ class CreatePlayers(object):
 
         Returns:
         float: The shared cost for the player.
-        """    
+        """
         num_infected_neighbor = self.get_neighbor_strategy(key_player)[2]
         num_vaccinated_neighbor = self.get_neighbor_strategy(key_player)[1]
         num_recovered_neighbor = self.get_neighbor_strategy(key_player)[3]
@@ -424,30 +423,48 @@ class CreatePlayers(object):
         Returns:
         float: The reward for the game.
         """
-        
-        self.lockdown_cost = (self.lattice_size)* 0.1
 
-        current_strategy = self.count_num_strategy_result(iterate) # get the current strategy number, percentage
+        self.lockdown_cost = (self.lattice_size) * 0.1
+
+        current_strategy = self.count_num_strategy_result(
+            iterate
+        )  # get the current strategy number, percentage
 
         if iterate != 0:
-            prev_strategy = self.count_num_strategy_result(iterate-1) # num strategy, % strategy
+            prev_strategy = self.count_num_strategy_result(
+                iterate - 1
+            )  # num strategy, % strategy
 
-            newly_vaccinated = current_strategy[1][1] - prev_strategy[1][1] # 1 = vaccinated
-            newly_infected = current_strategy[1][2] - prev_strategy[1][2] # 2 = infected
-            newly_recovered = current_strategy[1][3] - prev_strategy[1][3] # 3 = recovered
-            
-            cost = (newly_vaccinated * self.cost_vaccine) + (newly_infected * self.cost_infection) + (newly_recovered * self.cost_infection) 
+            newly_vaccinated = (
+                current_strategy[1][1] - prev_strategy[1][1]
+            )  # 1 = vaccinated
+            newly_infected = (
+                current_strategy[1][2] - prev_strategy[1][2]
+            )  # 2 = infected
+            newly_recovered = (
+                current_strategy[1][3] - prev_strategy[1][3]
+            )  # 3 = recovered
+
+            cost = (
+                (newly_vaccinated * self.cost_vaccine)
+                + (newly_infected * self.cost_infection)
+                + (newly_recovered * self.cost_infection)
+            )
         else:
-            initial_vaccinated = current_strategy[1][1] 
+            initial_vaccinated = current_strategy[1][1]
             initial_infected = current_strategy[1][2]
             initial_recovered = current_strategy[1][3]
 
-            cost = (initial_vaccinated * self.cost_vaccine) + (initial_infected * self.cost_infection) + (initial_recovered*self.cost_infection)
-        
+            cost = (
+                (initial_vaccinated * self.cost_vaccine)
+                + (initial_infected * self.cost_infection)
+                + (initial_recovered * self.cost_infection)
+            )
+
         if contact_rate == 0.5:
             cost = cost + self.lockdown_cost
 
-        reward = 1/(1 + np.exp(reward_factor*cost))
+        reward = 1 / (1 + np.exp(reward_factor * cost))
         # or try reLu
 
         return reward
@@ -540,7 +557,7 @@ class CreatePlayers(object):
 
     def update_lattice(self, iteration, contact_rate, pandemic_time):
         """Update the strategies of players for a given number of iterations.
-    
+
         Parameters
         ----------
         iteration : int
@@ -560,12 +577,12 @@ class CreatePlayers(object):
     # Functions for seeing result
     def build_matrix_strategy(self, iterate):
         """Build a matrix representing the strategies of players at a given iteration.
-    
+
         Parameters
         ----------
         iterate : int
             The iteration for which to build the matrix of strategies.
-            
+
         Returns
         -------
         matrix_strategy : list of lists
@@ -580,12 +597,12 @@ class CreatePlayers(object):
 
     def build_matrix_payoff(self, iterate):
         """Build a matrix representing the payoffs of players at a given iteration.
-    
+
         Parameters
         ----------
         iterate : int
             The iteration for which to build the matrix of payoffs.
-            
+
         Returns
         -------
         matrix_payoff : list of lists
@@ -600,12 +617,12 @@ class CreatePlayers(object):
 
     def draw_matrix_strategy(self, iterate):
         """Build a matrix representing the payoffs of players at a given iteration.
-    
+
         Parameters
         ----------
         iterate : int
             The iteration for which to build the matrix of payoffs.
-            
+
         Returns
         -------
         matrix_payoff : list of lists
@@ -697,10 +714,10 @@ class CreatePlayers(object):
 
     def calc_epidemic_season_length(self, iteration):
         """Calculate the length of the epidemic season.
-        
+
         Args:
             iteration (int): The maximum number of iterations.
-            
+
         Returns:
             int: The length of the epidemic season.
         """
@@ -711,8 +728,15 @@ class CreatePlayers(object):
                 break
         return epidemic_length
 
-
-    def plot_episode_changes(self, plot_title, pandemic_length, infected_num_list, vaccinated_num_list, recovered_num_list, reward_list):
+    def plot_episode_changes(
+        self,
+        plot_title,
+        pandemic_length,
+        infected_num_list,
+        vaccinated_num_list,
+        recovered_num_list,
+        reward_list,
+    ):
         """
         Plots the changes in different values during an episode of the simulation. It takes in the following parameters:
         Args:
@@ -729,17 +753,20 @@ class CreatePlayers(object):
         ax.plot(recovered_num_list, color="green")
         ax.set_xlabel("Length of the pandemic")
         ax.set_ylabel("Number of individuals")
-        ax.legend(['Infected', 'Vaccinated', 'Recovered'])    
-        ax.set_title("Change in total number of individuals \n for " + str(plot_title), fontdict={'size': 10})
-            
+        ax.legend(["Infected", "Vaccinated", "Recovered"])
+        ax.set_title(
+            "Change in total number of individuals \n for " + str(plot_title),
+            fontdict={"size": 10},
+        )
+
         plt.show()
-        fig.savefig("change_plot_" + str(pandemic_length)+ ".png", dpi=400)
+        fig.savefig("change_plot_" + str(pandemic_length) + ".png", dpi=400)
 
         fig2, axe = plt.subplots()
         axe.plot(reward_list, color="green")
         axe.set_xlabel("Length of the pandemic")
         axe.set_ylabel("Reward")
-        axe.set_title("Model Reward for "+ str(plot_title), fontdict={'size': 10})
+        axe.set_title("Model Reward for " + str(plot_title), fontdict={"size": 10})
 
         plt.show()
-        fig2.savefig("reward_alternative_" + str(pandemic_length)+ ".png", dpi=400)
+        fig2.savefig("reward_alternative_" + str(pandemic_length) + ".png", dpi=400)

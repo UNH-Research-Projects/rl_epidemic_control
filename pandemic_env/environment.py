@@ -7,6 +7,7 @@ import seaborn as sns
 
 sns.set_style("darkgrid")
 
+
 class PandemicEnv(gym.Env):
     """Custom environment for simulating a pandemic.
 
@@ -45,7 +46,7 @@ class PandemicEnv(gym.Env):
         sensitivity,
         reward_factor,
         plot_title=None,
-        train=True
+        train=True,
     ):
         # super(PandemicEnv, self).__init__()
         self.m = m
@@ -69,15 +70,23 @@ class PandemicEnv(gym.Env):
             cost_recover,
             lockdown_cost,
             transmission_rate,
-            sensitivity
+            sensitivity,
         )
         self.players_lattice.get_strategy()
         self.pandemic_length = 0
 
-        self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
+        self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = (
+            [],
+            [],
+            [],
+        )
         self.reward_list, self.actions_taken = [], []
-        self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = [], [], []
-        self.train = train # boolean to determine training or testing
+        self.avg_infected_epi, self.avg_vaccinated_epi, self.avg_recovered_epi = (
+            [],
+            [],
+            [],
+        )
+        self.train = train  # boolean to determine training or testing
 
     def step(self, action):
         """Execute one time step within the environment.
@@ -107,7 +116,9 @@ class PandemicEnv(gym.Env):
         self.vaccinated_num_list.append(self.players_lattice.count_num_strategy(1))
         self.recovered_num_list.append(self.players_lattice.count_num_strategy(3))
 
-        reward = self.players_lattice.calc_reward(contact_rate, self.pandemic_length, self.reward_factor)
+        reward = self.players_lattice.calc_reward(
+            contact_rate, self.pandemic_length, self.reward_factor
+        )
         self.reward_list.append(reward)
 
         # if self.pandemic_length >= 100:
@@ -115,11 +126,22 @@ class PandemicEnv(gym.Env):
         if num_infected <= 0:
             # plot charts showing change in values as the episode runs
             if self.plot_title is not None:
-                self.players_lattice.plot_episode_changes(self.plot_title, self.pandemic_length, self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list, self.reward_list) 
-                
-            # reset list values    
-            self.infected_num_list, self.vaccinated_num_list, self.recovered_num_list = [], [], []
-            self.reward_list = []  
+                self.players_lattice.plot_episode_changes(
+                    self.plot_title,
+                    self.pandemic_length,
+                    self.infected_num_list,
+                    self.vaccinated_num_list,
+                    self.recovered_num_list,
+                    self.reward_list,
+                )
+
+            # reset list values
+            (
+                self.infected_num_list,
+                self.vaccinated_num_list,
+                self.recovered_num_list,
+            ) = ([], [], [])
+            self.reward_list = []
 
             done = True
         else:
