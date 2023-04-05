@@ -762,15 +762,15 @@ class CreatePlayers(object):
 
         # color the background for the specified x range for all y-axis limits
         for i in range(len(actions_taken)-1):
-            if actions_taken[i] == 1:
+            if int(actions_taken[i]) == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
                 ax.axvspan(start_x, end_x, alpha=0.3, color='red')
 
-            else:
-                start_x = infected_num_list[i]
-                end_x = infected_num_list[i+1]
-                ax.axvspan(start_x, end_x, alpha=0.3, color='green')
+            # else:
+            #     start_x = infected_num_list[i]
+            #     end_x = infected_num_list[i+1]
+            #     ax.axvspan(start_x, end_x, alpha=0.3, color='green')
 
         plt.show()
         fig.savefig("change_plot_" + str(pandemic_length) + ".png", dpi=400)
@@ -783,15 +783,15 @@ class CreatePlayers(object):
 
         # color the background for the specified x range for all y-axis limits
         for i in range(len(actions_taken)-1):
-            if actions_taken[i] == 1:
+            if int(actions_taken[i]) == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
                 axe.axvspan(start_x, end_x, alpha=0.3, color='red')
 
-            else:
-                start_x = infected_num_list[i]
-                end_x = infected_num_list[i+1]
-                axe.axvspan(start_x, end_x, alpha=0.3, color='green')
+            # else:
+            #     start_x = infected_num_list[i]
+            #     end_x = infected_num_list[i+1]
+            #     axe.axvspan(start_x, end_x, alpha=0.3, color='green')
 
         plt.show()
         fig2.savefig("reward_alternative_" + str(pandemic_length) + ".png", dpi=400)
