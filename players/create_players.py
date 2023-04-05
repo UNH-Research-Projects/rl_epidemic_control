@@ -761,8 +761,9 @@ class CreatePlayers(object):
         )
 
         # color the background for the specified x range for all y-axis limits
+        print("Actions:", actions_taken)
         for i in range(len(actions_taken)-1):
-            if int(actions_taken[i]) == 1:
+            if actions_taken[i] == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
                 ax.axvspan(start_x, end_x, alpha=0.3, color='red')
@@ -783,7 +784,7 @@ class CreatePlayers(object):
 
         # color the background for the specified x range for all y-axis limits
         for i in range(len(actions_taken)-1):
-            if int(actions_taken[i]) == 1:
+            if actions_taken[i] == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
                 axe.axvspan(start_x, end_x, alpha=0.3, color='red')
