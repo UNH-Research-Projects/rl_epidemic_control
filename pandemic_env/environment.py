@@ -108,7 +108,7 @@ class PandemicEnv(gym.Env):
         self.pandemic_length += iteration
 
         # actions
-        # self.actions_taken.append(action)
+        self.actions_taken.append(action)
         num_infected = self.players_lattice.count_num_strategy(2)
 
         # print("Infections for step {}: {} ".format(self.pandemic_length, num_infected))
@@ -133,6 +133,7 @@ class PandemicEnv(gym.Env):
                     self.vaccinated_num_list,
                     self.recovered_num_list,
                     self.reward_list,
+                    self.actions_taken
                 )
 
             # reset list values
