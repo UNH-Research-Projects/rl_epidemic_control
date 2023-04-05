@@ -766,10 +766,10 @@ class CreatePlayers(object):
             start_x = i
             end_x = i+1            
             if actions_taken[i] == 1:
-                ax.axvspan(start_x, end_x, alpha=0.3, color='red')
+                ax.axvspan(start_x, end_x, alpha=0.2, color='red')
 
             else:
-                ax.axvspan(start_x, end_x, alpha=0.3, color='green')
+                ax.axvspan(start_x, end_x, alpha=0.2, color='green')
 
         plt.show()
         fig.savefig("change_plot_" + str(pandemic_length) + ".png", dpi=400)
@@ -785,10 +785,10 @@ class CreatePlayers(object):
             start_x = i
             end_x = i+1            
             if actions_taken[i] == 1:
-                axe.axvspan(start_x, end_x, alpha=0.3, color='red')
+                axe.axvspan(start_x, end_x, alpha=0.2, color='red')
 
             else:
-                axe.axvspan(start_x, end_x, alpha=0.3, color='green')
+                axe.axvspan(start_x, end_x, alpha=0.2, color='green')
 
         plt.show()
         fig2.savefig("reward_alternative_" + str(pandemic_length) + ".png", dpi=400)
