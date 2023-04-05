@@ -761,7 +761,7 @@ class CreatePlayers(object):
         )
 
         # color the background for the specified x range for all y-axis limits
-        for i in range(len(actions_taken)):
+        for i in range(len(actions_taken)-1):
             if actions_taken[i] == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
@@ -782,7 +782,7 @@ class CreatePlayers(object):
         axe.set_title("Model Reward for " + str(plot_title), fontdict={"size": 10})
 
         # color the background for the specified x range for all y-axis limits
-        for i in range(len(actions_taken)):
+        for i in range(len(actions_taken)-1):
             if actions_taken[i] == 1:
                 start_x = infected_num_list[i]
                 end_x = infected_num_list[i+1]
