@@ -142,7 +142,7 @@ class PandemicEnv(gym.Env):
                 self.vaccinated_num_list,
                 self.recovered_num_list,
             ) = ([], [], [])
-            self.reward_list = []
+            self.reward_list, self.actions_taken = [], []
 
             done = True
         else:
