@@ -779,6 +779,8 @@ class CreatePlayers(object):
         axe.set_xlabel("Length of the pandemic")
         axe.set_ylabel("Reward")
         axe.set_title("Model Reward for " + str(plot_title), fontdict={"size": 10})
+        print("Reward:", reward_list)
+        print("Cumulative reward:", sum(reward_list))
 
         # color the background for the specified x range for all y-axis limits
         for i in range(len(actions_taken)-1):
